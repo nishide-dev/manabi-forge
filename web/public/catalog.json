@@ -1,41 +1,80 @@
 {
-  "schema_version": "1.0",
   "includes_drafts": true,
   "materials": [
     {
-      "id": "math1-qf-guided-0001",
-      "version": "0.1.0",
-      "title": "二次関数の最大・最小",
-      "language": "ja",
-      "status": "draft",
-      "subject": "mathematics",
+      "ai_assisted": true,
+      "artifacts": {
+        "answer_sheet_pdf": null,
+        "problem_pdf": null,
+        "solution_pdf": null,
+        "source_bundle": null
+      },
       "course": "mathematics-i",
-      "units": ["quadratic-functions"],
-      "format": "guided-example",
-      "difficulty": "standard",
-      "estimated_minutes": 15,
-      "curriculum_snapshot": "mext-84V10-2026-08",
       "curriculum_codes": [
         "84V10-math-i-quadratic-functions",
         "84V10-math-i-qf-max-min"
       ],
+      "curriculum_snapshot": "mext-84V10-2026-08",
+      "difficulty": "standard",
+      "estimated_minutes": 15,
+      "format": "common-test-style",
+      "id": "math1-qf-common-0001",
+      "language": "ja",
+      "license": "CC-BY-4.0",
+      "status": "draft",
+      "subject": "mathematics",
+      "title": "二次関数の最大・最小(演習)",
+      "units": [
+        "quadratic-functions"
+      ],
       "validation": {
-        "schema": "pending",
-        "tex": "pending",
-        "mathematics": "pending",
         "curriculum": "pending",
         "editorial": "pending",
-        "visual": "pending",
-        "rights": "pending"
+        "mathematics": "pending",
+        "rights": "pending",
+        "schema": "pending",
+        "tex": "pending",
+        "visual": "pending"
       },
-      "license": "CC-BY-4.0",
+      "version": "0.1.0"
+    },
+    {
       "ai_assisted": true,
       "artifacts": {
-        "problem_pdf": null,
         "answer_sheet_pdf": null,
+        "problem_pdf": null,
         "solution_pdf": null,
         "source_bundle": null
-      }
+      },
+      "course": "mathematics-i",
+      "curriculum_codes": [
+        "84V10-math-i-quadratic-functions",
+        "84V10-math-i-qf-max-min"
+      ],
+      "curriculum_snapshot": "mext-84V10-2026-08",
+      "difficulty": "standard",
+      "estimated_minutes": 15,
+      "format": "guided-example",
+      "id": "math1-qf-guided-0001",
+      "language": "ja",
+      "license": "CC-BY-4.0",
+      "status": "draft",
+      "subject": "mathematics",
+      "title": "二次関数の最大・最小",
+      "units": [
+        "quadratic-functions"
+      ],
+      "validation": {
+        "curriculum": "pending",
+        "editorial": "pending",
+        "mathematics": "pending",
+        "rights": "pending",
+        "schema": "pending",
+        "tex": "pending",
+        "visual": "pending"
+      },
+      "version": "0.1.0"
     }
-  ]
+  ],
+  "schema_version": "1.0"
 }
