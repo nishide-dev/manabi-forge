@@ -130,6 +130,107 @@
       ],
       "title": "SourceData",
       "type": "object"
+    },
+    "VerificationCheck": {
+      "additionalProperties": false,
+      "description": "One machine-checkable claim about the item (spec §13.4).\n\nexpression は変数 x の SymPy 可読な式。domain は閉区間 [a, b]、\nNone は実数全体を表す。ここに載らない主張は自動検証の対象外として\n人間レビューへ明示的にエスカレートされる。",
+      "properties": {
+        "domain": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Domain"
+        },
+        "expected_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Value"
+        },
+        "expected_x": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected X"
+        },
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/VerificationKind"
+        },
+        "rhs": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rhs"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "expression"
+      ],
+      "title": "VerificationCheck",
+      "type": "object"
+    },
+    "VerificationKind": {
+      "description": "Machine-checkable verification strategies (spec §13.4).",
+      "enum": [
+        "maximum",
+        "minimum",
+        "vertex",
+        "equivalent"
+      ],
+      "title": "VerificationKind",
+      "type": "string"
     }
   },
   "$id": "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/item.schema.json",
@@ -189,6 +290,13 @@
       "minLength": 1,
       "title": "Stem",
       "type": "string"
+    },
+    "verification_checks": {
+      "items": {
+        "$ref": "#/$defs/VerificationCheck"
+      },
+      "title": "Verification Checks",
+      "type": "array"
     },
     "verification_strategy": {
       "minLength": 1,

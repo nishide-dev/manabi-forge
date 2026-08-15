@@ -6,11 +6,42 @@
 
 from __future__ import annotations
 
+import re
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from manabi_forge.models.common import MaterialId, NonEmptyStr
+
+#: 検証式に許可する文法(信頼境界)。x・数字・四則・べき・括弧のみ。
+#: 英字(x 以外)・アンダースコア・引用符等を禁止することで、SymPy の
+#: パーサ(内部で eval を使う)に任意コードが到達しない(spec §19.2)。
+SAFE_EXPRESSION_PATTERN = re.compile(r"^[0-9x+\-*/(). ]+$")
+
+#: 定数(expected 値)にはさらに x も許可しない。
+SAFE_CONSTANT_PATTERN = re.compile(r"^[0-9+\-*/(). ]+$")
+
+MAX_EXPRESSION_LENGTH = 200
+
+_LONG_INTEGER = re.compile(r"\d{10,}")
+
+
+def validate_safe_expression(value: str, *, allow_x: bool) -> str:
+    """Reject anything outside the whitelisted expression grammar."""
+    pattern = SAFE_EXPRESSION_PATTERN if allow_x else SAFE_CONSTANT_PATTERN
+    if len(value) > MAX_EXPRESSION_LENGTH:
+        msg = f"expression too long (>{MAX_EXPRESSION_LENGTH} chars)"
+        raise ValueError(msg)
+    if not pattern.fullmatch(value):
+        msg = (
+            f"expression {value!r} contains characters outside the safe grammar "
+            "(digits, x, + - * / ( ) . のみ)"
+        )
+        raise ValueError(msg)
+    if _LONG_INTEGER.search(value):
+        msg = f"expression {value!r} contains an integer literal with 10+ digits"
+        raise ValueError(msg)
+    return value
 
 
 class AnswerType(StrEnum):
@@ -51,6 +82,69 @@ class Accessibility(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     figure_descriptions: list[NonEmptyStr] = Field(default_factory=list)
+
+
+class VerificationKind(StrEnum):
+    """Machine-checkable verification strategies (spec §13.4)."""
+
+    MAXIMUM = "maximum"
+    MINIMUM = "minimum"
+    VERTEX = "vertex"
+    EQUIVALENT = "equivalent"
+
+
+class VerificationCheck(BaseModel):
+    """One machine-checkable claim about the item (spec §13.4).
+
+    expression は変数 x の SymPy 可読な式。domain は閉区間 [a, b]、
+    None は実数全体を表す。ここに載らない主張は自動検証の対象外として
+    人間レビューへ明示的にエスカレートされる。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: NonEmptyStr
+    kind: VerificationKind
+    expression: NonEmptyStr
+    domain: tuple[float, float] | None = None
+    expected_x: float | str | None = None
+    expected_value: float | str | None = None
+    rhs: str | None = None
+
+    @field_validator("expression", "rhs")
+    @classmethod
+    def _expression_is_safe(cls, value: str | None) -> str | None:
+        """Enforce the safe expression grammar at the trust boundary."""
+        if value is None:
+            return value
+        return validate_safe_expression(value, allow_x=True)
+
+    @field_validator("expected_x", "expected_value")
+    @classmethod
+    def _expected_is_safe(cls, value: float | str | None) -> float | str | None:
+        """Require string expected values to be safe constants (e.g. "1/3")."""
+        if isinstance(value, str):
+            return validate_safe_expression(value, allow_x=False)
+        return value
+
+    @model_validator(mode="after")
+    def _fields_match_kind(self) -> VerificationCheck:
+        """Require the fields each verification kind needs."""
+        needs_extrema = self.kind in {
+            VerificationKind.MAXIMUM,
+            VerificationKind.MINIMUM,
+            VerificationKind.VERTEX,
+        }
+        if needs_extrema and (self.expected_x is None or self.expected_value is None):
+            msg = f"check {self.id}: {self.kind.value} requires expected_x and expected_value"
+            raise ValueError(msg)
+        if self.kind is VerificationKind.EQUIVALENT and not self.rhs:
+            msg = f"check {self.id}: equivalent requires rhs"
+            raise ValueError(msg)
+        if self.domain is not None and self.domain[0] >= self.domain[1]:
+            msg = f"check {self.id}: domain must satisfy a < b"
+            raise ValueError(msg)
+        return self
 
 
 class ItemPart(BaseModel):
@@ -115,6 +209,7 @@ class ItemSpec(BaseModel):
 
     source_data: list[SourceData] = Field(default_factory=list)
     accessibility: Accessibility = Field(default_factory=Accessibility)
+    verification_checks: list[VerificationCheck] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _part_ids_unique(self) -> ItemSpec:
