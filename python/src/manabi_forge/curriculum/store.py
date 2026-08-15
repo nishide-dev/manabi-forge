@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from manabi_forge.models.curriculum import CurriculumRecord
 
@@ -19,6 +19,10 @@ if TYPE_CHECKING:
 
 class DuplicateCodeError(ValueError):
     """Raised when two normalized records share the same curriculum code."""
+
+
+class InvalidRecordError(ValueError):
+    """Raised when a normalized record file fails schema validation."""
 
 
 class CurriculumStore(BaseModel):
@@ -68,9 +72,19 @@ def load_store(normalized_dir: Path) -> CurriculumStore:
     """
     records: list[CurriculumRecord] = []
     seen: dict[str, Path] = {}
-    for path in sorted(normalized_dir.rglob("*.yaml")):
+    paths = sorted(
+        path
+        for pattern in ("*.yaml", "*.yml")
+        for path in normalized_dir.rglob(pattern)
+    )
+    for path in paths:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
-        record = CurriculumRecord.model_validate(data)
+        try:
+            record = CurriculumRecord.model_validate(data)
+        except ValidationError as exc:
+            # どのファイルが壊れているか分かるよう、パスを添えて再送出する
+            msg = f"invalid curriculum record {path}: {exc}"
+            raise InvalidRecordError(msg) from exc
         if record.code in seen:
             msg = f"duplicate curriculum code {record.code!r}: {seen[record.code]} and {path}"
             raise DuplicateCodeError(msg)

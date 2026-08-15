@@ -1,5 +1,6 @@
 """Tests for the curriculum knowledge base (spec §10)."""
 
+import json
 from pathlib import Path
 
 import pytest
@@ -7,7 +8,12 @@ import yaml
 from typer.testing import CliRunner
 
 from manabi_forge.cli.main import app
-from manabi_forge.curriculum import CurriculumStore, DuplicateCodeError, load_store
+from manabi_forge.curriculum import (
+    CurriculumStore,
+    DuplicateCodeError,
+    InvalidRecordError,
+    load_store,
+)
 from manabi_forge.models.curriculum import CurriculumRecord
 from manabi_forge.schema_export import find_repo_root
 
@@ -63,6 +69,21 @@ class TestLoadStore:
         write_record(tmp_path / "a", make_record_data("84V10-dup-0001"))
         write_record(tmp_path / "b", make_record_data("84V10-dup-0001"))
         with pytest.raises(DuplicateCodeError):
+            load_store(tmp_path)
+
+    def test_loads_yml_extension_too(self, tmp_path):
+        data = make_record_data("84V10-yml-0001")
+        (tmp_path / "record.yml").write_text(
+            yaml.safe_dump(data, allow_unicode=True),
+            encoding="utf-8",
+        )
+        store = load_store(tmp_path)
+        assert store.by_code("84V10-yml-0001") is not None
+
+    def test_invalid_record_error_names_the_file(self, tmp_path):
+        bad = tmp_path / "broken.yaml"
+        bad.write_text("code: only-a-code\n", encoding="utf-8")
+        with pytest.raises(InvalidRecordError, match=r"broken\.yaml"):
             load_store(tmp_path)
 
 
@@ -126,10 +147,35 @@ class TestCurriculumCli:
         assert result.exit_code == 0
         assert "84V10-math-i-quadratic-functions" in result.output
 
-    def test_query_json(self):
+    def test_query_json_is_parseable(self):
         result = runner.invoke(
             app,
             ["curriculum", "query", "--course", "mathematics-i", "--json"],
         )
         assert result.exit_code == 0
-        assert '"code"' in result.output
+        records = json.loads(result.output)
+        assert len(records) >= 1
+        assert records[0]["course"] == "mathematics-i"
+
+    def test_validate_json_is_parseable(self):
+        result = runner.invoke(app, ["curriculum", "validate", "--json"])
+        assert result.exit_code == 0
+        payload = json.loads(result.output)
+        assert payload["unresolved"] == []
+        assert payload["records"] >= 1
+
+    def test_validate_fails_on_unreadable_manifest(self, monkeypatch, tmp_path):
+        # 読めないマニフェストは「解決できたか不明」なので失敗として数える
+        normalized = tmp_path / "curriculum" / "normalized"
+        normalized.mkdir(parents=True)
+        write_record(normalized, make_record_data("84V10-x-0001"))
+        broken = tmp_path / "materials" / "math" / "c" / "u" / "id-0001"
+        broken.mkdir(parents=True)
+        (broken / "material.yaml").write_text("id: [broken", encoding="utf-8")
+        monkeypatch.setattr(
+            "manabi_forge.cli.curriculum.find_repo_root",
+            lambda: tmp_path,
+        )
+        result = runner.invoke(app, ["curriculum", "validate"])
+        assert result.exit_code == 1
+        assert "unreadable manifest" in result.output

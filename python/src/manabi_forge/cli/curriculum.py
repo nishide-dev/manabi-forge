@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Annotated
 
 import typer
@@ -9,7 +10,12 @@ import yaml
 from pydantic import ValidationError
 
 from manabi_forge.cli.material import discover_material_dirs
-from manabi_forge.curriculum import CurriculumStore, DuplicateCodeError, load_store
+from manabi_forge.curriculum import (
+    CurriculumStore,
+    DuplicateCodeError,
+    InvalidRecordError,
+    load_store,
+)
 from manabi_forge.models import MaterialManifest
 from manabi_forge.schema_export import find_repo_root
 
@@ -45,7 +51,12 @@ def validate(
     """
     try:
         store = _load_repo_store()
-    except (ValidationError, DuplicateCodeError, yaml.YAMLError) as exc:
+    except (
+        ValidationError,
+        DuplicateCodeError,
+        InvalidRecordError,
+        yaml.YAMLError,
+    ) as exc:
         typer.echo(f"curriculum records invalid: {exc}", err=True)
         raise typer.Exit(EXIT_VALIDATION_FAILURE) from exc
 
@@ -57,8 +68,16 @@ def validate(
             manifest = MaterialManifest.model_validate(
                 yaml.safe_load(manifest_path.read_text(encoding="utf-8")),
             )
-        except (ValidationError, yaml.YAMLError):
-            # マニフェスト自体の問題は `manabi material validate` が報告する
+        except (ValidationError, yaml.YAMLError) as exc:
+            # 読めないマニフェストは「コードを解決できたか不明」であり、
+            # ゲートとしては失敗として数える(黙って素通りさせない)。
+            # 詳細な診断は `manabi material validate` が行う。
+            failures.append(
+                {
+                    "material": str(manifest_path),
+                    "error": f"unreadable manifest: {type(exc).__name__}",
+                },
+            )
             continue
         missing = store.missing_codes(manifest.curriculum.codes)
         if missing:
@@ -69,14 +88,12 @@ def validate(
             "records": len(store.records),
             "unresolved": failures,
         }
-        typer.echo(yaml.safe_dump(payload, allow_unicode=True, sort_keys=True))
+        typer.echo(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     else:
         typer.echo(f"{len(store.records)} curriculum records loaded")
         for failure in failures:
-            typer.echo(
-                f"  [error] {failure['material']}: unresolved codes "
-                f"{failure['missing_codes']}",
-            )
+            detail = failure.get("missing_codes") or failure.get("error")
+            typer.echo(f"  [error] {failure['material']}: {detail}")
     if failures:
         raise typer.Exit(EXIT_VALIDATION_FAILURE)
 
