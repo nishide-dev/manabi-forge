@@ -14,6 +14,7 @@ from manabi_forge import __version__
 from manabi_forge.cli.catalog import app as catalog_app
 from manabi_forge.cli.curriculum import app as curriculum_app
 from manabi_forge.cli.material import app as material_app
+from manabi_forge.cli.release import app as release_app
 from manabi_forge.cli.schemas import app as schemas_app
 from manabi_forge.cli.tex import app as tex_app
 from manabi_forge.cli.verify import app as verify_app
@@ -34,6 +35,7 @@ app = typer.Typer(
 app.add_typer(catalog_app)
 app.add_typer(curriculum_app)
 app.add_typer(material_app)
+app.add_typer(release_app)
 app.add_typer(schemas_app)
 app.add_typer(tex_app)
 app.add_typer(verify_app)
