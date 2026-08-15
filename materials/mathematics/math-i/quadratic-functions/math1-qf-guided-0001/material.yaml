@@ -3,7 +3,7 @@ id: math1-qf-guided-0001
 version: 0.1.0
 title: 二次関数の最大・最小
 language: ja
-status: approved
+status: published
 
 classification:
   school_level: high-school
@@ -26,10 +26,10 @@ curriculum:
   alignment_status: aligned
 
 artifacts:
-  problem_pdf: null
+  problem_pdf: https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-guided-0001-v0.1.0/math1-qf-guided-0001-v0.1.0-problem.pdf
   answer_sheet_pdf: null
   solution_pdf: null
-  source_bundle: null
+  source_bundle: https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-guided-0001-v0.1.0/math1-qf-guided-0001-v0.1.0-source.zip
 
 validation:
   schema: passed
