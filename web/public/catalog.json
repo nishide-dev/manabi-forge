@@ -5,9 +5,9 @@
       "ai_assisted": true,
       "artifacts": {
         "answer_sheet_pdf": null,
-        "problem_pdf": null,
+        "problem_pdf": "https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-common-0001-v0.1.0/math1-qf-common-0001-v0.1.0-problem.pdf",
         "solution_pdf": null,
-        "source_bundle": null
+        "source_bundle": "https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-common-0001-v0.1.0/math1-qf-common-0001-v0.1.0-source.zip"
       },
       "course": "mathematics-i",
       "curriculum_codes": [
@@ -21,7 +21,7 @@
       "id": "math1-qf-common-0001",
       "language": "ja",
       "license": "CC-BY-4.0",
-      "status": "approved",
+      "status": "published",
       "subject": "mathematics",
       "title": "二次関数の最大・最小(演習)",
       "units": [
@@ -42,9 +42,9 @@
       "ai_assisted": true,
       "artifacts": {
         "answer_sheet_pdf": null,
-        "problem_pdf": null,
+        "problem_pdf": "https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-guided-0001-v0.1.0/math1-qf-guided-0001-v0.1.0-problem.pdf",
         "solution_pdf": null,
-        "source_bundle": null
+        "source_bundle": "https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-guided-0001-v0.1.0/math1-qf-guided-0001-v0.1.0-source.zip"
       },
       "course": "mathematics-i",
       "curriculum_codes": [
@@ -58,7 +58,7 @@
       "id": "math1-qf-guided-0001",
       "language": "ja",
       "license": "CC-BY-4.0",
-      "status": "approved",
+      "status": "published",
       "subject": "mathematics",
       "title": "二次関数の最大・最小",
       "units": [
