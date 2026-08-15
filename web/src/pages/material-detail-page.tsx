@@ -117,7 +117,10 @@ export function MaterialDetailPage() {
           <h2 className="font-medium">プレビュー</h2>
           <div className="mt-2">
             <PdfPreview
-              url={material.artifacts.problem_pdf}
+              // リリースアセットは CORS を返さないため、デプロイ時に
+              // サイト内へミラーした same-origin コピーから読む(spec §17.5)
+              url={`${import.meta.env.BASE_URL}artifacts/${material.artifacts.problem_pdf.split("/").at(-1)}`}
+              downloadHref={material.artifacts.problem_pdf}
               title={`${material.title}(問題 PDF)`}
             />
           </div>

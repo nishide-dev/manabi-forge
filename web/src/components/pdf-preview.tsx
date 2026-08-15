@@ -17,7 +17,17 @@ type State =
   | { status: "error"; message: string }
   | { status: "ready"; doc: PdfDocument; pageCount: number }
 
-export function PdfPreview({ url, title }: { url: string; title: string }) {
+export function PdfPreview({
+  url,
+  downloadHref,
+  title,
+}: {
+  /** プレビューの取得元(same-origin のミラー。spec §17.5) */
+  url: string
+  /** ダウンロードリンク先(正本のリリース URL)。省略時は url */
+  downloadHref?: string
+  title: string
+}) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const [state, setState] = React.useState<State>({ status: "loading" })
   const [pageNumber, setPageNumber] = React.useState(1)
@@ -71,7 +81,7 @@ export function PdfPreview({ url, title }: { url: string; title: string }) {
     <div className="flex flex-col gap-2">
       {/* ビューア初期化に失敗してもダウンロードは常に可能(spec §17.5) */}
       <p className="text-sm">
-        <a className="underline" href={url} download>
+        <a className="underline" href={downloadHref ?? url} download>
           {title} をダウンロード
         </a>
       </p>
