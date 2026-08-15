@@ -1,5 +1,5 @@
 {
-  "includes_drafts": true,
+  "includes_drafts": false,
   "materials": [
     {
       "ai_assisted": true,
@@ -21,20 +21,20 @@
       "id": "math1-qf-common-0001",
       "language": "ja",
       "license": "CC-BY-4.0",
-      "status": "draft",
+      "status": "approved",
       "subject": "mathematics",
       "title": "二次関数の最大・最小(演習)",
       "units": [
         "quadratic-functions"
       ],
       "validation": {
-        "curriculum": "pending",
-        "editorial": "pending",
-        "mathematics": "pending",
-        "rights": "pending",
-        "schema": "pending",
-        "tex": "pending",
-        "visual": "pending"
+        "curriculum": "passed",
+        "editorial": "passed",
+        "mathematics": "passed",
+        "rights": "passed",
+        "schema": "passed",
+        "tex": "passed",
+        "visual": "passed"
       },
       "version": "0.1.0"
     },
@@ -58,20 +58,20 @@
       "id": "math1-qf-guided-0001",
       "language": "ja",
       "license": "CC-BY-4.0",
-      "status": "draft",
+      "status": "approved",
       "subject": "mathematics",
       "title": "二次関数の最大・最小",
       "units": [
         "quadratic-functions"
       ],
       "validation": {
-        "curriculum": "pending",
-        "editorial": "pending",
-        "mathematics": "pending",
-        "rights": "pending",
-        "schema": "pending",
-        "tex": "pending",
-        "visual": "pending"
+        "curriculum": "passed",
+        "editorial": "passed",
+        "mathematics": "passed",
+        "rights": "passed",
+        "schema": "passed",
+        "tex": "passed",
+        "visual": "passed"
       },
       "version": "0.1.0"
     }

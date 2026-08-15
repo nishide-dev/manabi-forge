@@ -3,7 +3,7 @@ id: math1-qf-common-0001
 version: 0.1.0
 title: 二次関数の最大・最小(演習)
 language: ja
-status: draft
+status: approved
 
 classification:
   school_level: high-school
@@ -22,7 +22,7 @@ curriculum:
   codes:
     - 84V10-math-i-quadratic-functions
     - 84V10-math-i-qf-max-min
-  alignment_status: pending
+  alignment_status: aligned
 
 artifacts:
   problem_pdf: null
@@ -31,13 +31,13 @@ artifacts:
   source_bundle: null
 
 validation:
-  schema: pending
-  tex: pending
-  mathematics: pending
-  curriculum: pending
-  editorial: pending
-  visual: pending
-  rights: pending
+  schema: passed
+  tex: passed
+  mathematics: passed
+  curriculum: passed
+  editorial: passed
+  visual: passed
+  rights: passed
 
 license:
   content: CC-BY-4.0
