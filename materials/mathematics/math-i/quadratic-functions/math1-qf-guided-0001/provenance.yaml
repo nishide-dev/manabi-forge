@@ -1,0 +1,16 @@
+schema_version: "1.0"
+material_id: math1-qf-guided-0001
+
+authors:
+  - nishide-dev
+editors: []
+
+ai_steps:
+  - description: 学習目標(定義域つき二次関数の最大・最小)から段階解説型の本文と TeX を起草
+    model: claude-fable-5
+    prompt_summary: 独自ブリーフに基づく guided-example 教材の下書き。既存問題の複製・言い換えは行っていない。
+
+sources: []
+
+similarity_review: pending
+rights_review: pending
