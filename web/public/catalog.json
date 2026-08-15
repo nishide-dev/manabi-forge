@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "generated_by": "sample (manabi catalog build 実装後に生成物へ置き換える: issue #5)",
+  "materials": [
+    {
+      "id": "math1-qf-guided-0001",
+      "version": "0.1.0",
+      "title": "二次関数の最大・最小",
+      "language": "ja",
+      "status": "draft",
+      "subject": "mathematics",
+      "course": "mathematics-i",
+      "units": ["quadratic-functions"],
+      "format": "guided-example",
+      "difficulty": "standard",
+      "estimated_minutes": 15,
+      "curriculum_snapshot": "mext-84V10-2026-08",
+      "curriculum_codes": [
+        "84V10-math-i-quadratic-functions",
+        "84V10-math-i-qf-max-min"
+      ],
+      "validation": {
+        "schema": "pending",
+        "tex": "pending",
+        "mathematics": "pending",
+        "curriculum": "pending",
+        "editorial": "pending",
+        "visual": "pending",
+        "rights": "pending"
+      },
+      "license": "CC-BY-4.0",
+      "ai_assisted": true,
+      "artifacts": {
+        "problem_pdf": null,
+        "answer_sheet_pdf": null,
+        "solution_pdf": null,
+        "source_bundle": null
+      }
+    }
+  ]
+}
