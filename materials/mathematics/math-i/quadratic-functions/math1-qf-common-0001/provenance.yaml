@@ -1,0 +1,16 @@
+schema_version: "1.0"
+material_id: math1-qf-common-0001
+
+authors:
+  - nishide-dev
+editors: []
+
+ai_steps:
+  - description: 学習目標(定義域つき二次関数の最大・最小)から独自ブリーフを立て、文章題・解答欄構成・選択肢・解説を起草
+    model: claude-fable-5
+    prompt_summary: 独自ブリーフに基づく共通テスト風教材の下書き。過去問題・公式サンプル問題の参照や複製は行っていない。
+
+sources: []
+
+similarity_review: pending
+rights_review: pending

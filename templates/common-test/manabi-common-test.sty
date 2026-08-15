@@ -1,0 +1,63 @@
+%% manabi-common-test.sty — 共通テスト風テンプレート(spec §15.2)
+%% 多パート問題、選択肢、解答欄記号(ア・イ・…)のコンポーネントを提供する。
+%% 視覚デザインは Manabi Forge 独自のものであり、公式の試験冊子を
+%% 複製しない。全ページに非公式教材ディスクレーマーが入る(共有クラス)。
+%% ライセンス: Apache-2.0(リポジトリルートの LICENSE-CODE)
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{manabi-common-test}[2026/08/16 v0.1.0 Manabi Forge common-test style template]
+
+\ManabiTemplate{common-test}{0.1.0}
+
+%% 共通テスト風教材は「過去問・公式サンプルではない」旨も明示する(spec §4.3)
+\renewcommand*\ManabiDisclaimer{%
+  この教材は Manabi Forge contributors が独自に制作した非公式教材です。%
+  文部科学省、大学入試センター、教科書会社、参考書出版社その他の団体による%
+  公式教材ではありません。本教材は共通テストの出題形式を参考にした独自の%
+  演習教材であり、過去問題や公式サンプル問題ではありません。}
+
+%% --- 大問ボックス -----------------------------------------------------------
+%% 使用例: \begin{mnbproblem}[(配点 20)]{1} ... \end{mnbproblem}
+%% 注意: 任意引数(配点など)が先、大問番号が後。逆にすると配点が本文に
+%% リークしたまま黙って組版されるので順序を守ること。
+\newtcolorbox{mnbproblem}[2][]{
+  colback=white,
+  colframe=black!80,
+  coltitle=white,
+  colbacktitle=black!80,
+  boxrule=0.6pt,
+  arc=1.5pt,
+  left=8pt, right=8pt, top=7pt, bottom=7pt,
+  breakable,
+  fonttitle=\bfseries\small,
+  title={第#2問 #1},
+  before skip=10pt, after skip=10pt,
+}
+
+%% --- 解答欄記号 --------------------------------------------------------------
+%% \mnbans{アイ}: 解答欄に対応する枠付き記号。慣例として数字 1 桁につき
+%% 記号 1 文字を割り当てるが、表示は 1 つの枠にまとめる(桁ごとの枠分割は
+%% 解答用紙テンプレート導入時に検討)。
+\newcommand*\mnbans[1]{%
+  \mbox{\fboxsep=2.5pt\fbox{\textbf{\vphantom{アj}#1}}}}
+
+%% --- 小問リスト --------------------------------------------------------------
+\newlist{mnbparts}{enumerate}{1}
+\setlist[mnbparts]{label=(\arabic*), leftmargin=2.2em, itemsep=6pt}
+
+%% --- 選択肢 ------------------------------------------------------------------
+%% 横並びの選択肢: \begin{mnbchoices} \item ... \end{mnbchoices}
+\newcommand*\mnbcircled[1]{\textcircled{\kern0.4pt\raisebox{0.4pt}{\scriptsize #1}\kern0.4pt}}
+\newlist{mnbchoices}{enumerate*}{1}
+\setlist[mnbchoices]{label=\protect\mnbcircled{\arabic*}, itemjoin=\hspace{1.6em}, before=\vspace{2pt}}
+
+%% --- 解答・解説セクション ----------------------------------------------------
+%% 問題冊子と明確に区切る(公開時は別 PDF として配布予定)。
+\newcommand*\ManabiSolutionPart{%
+  \newpage
+  \begin{center}
+    {\large\bfseries 解答・解説}\\[2pt]
+    {\small ここから先は解答編です。問題を解いてから読むことを推奨します。}
+  \end{center}
+  \vspace{4pt}}
+
+\endinput

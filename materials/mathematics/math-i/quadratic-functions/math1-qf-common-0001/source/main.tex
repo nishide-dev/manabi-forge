@@ -1,0 +1,77 @@
+%% math1-qf-common-0001 — 二次関数の最大・最小(共通テスト風・独自問題)
+%% Manabi Forge contributors による独自制作の非公式教材。
+%% 過去問題・公式サンプル問題の複製や言い換えではない。
+%% コンテンツライセンス: CC BY 4.0(リポジトリルートの LICENSE-CONTENT)
+\documentclass[common-test]{manabi}
+
+\ManabiId{math1-qf-common-0001}
+\ManabiVersion{0.1.0}
+\ManabiTitle{二次関数の最大・最小(演習)}
+\ManabiCourse{数学I}
+\ManabiUnit{二次関数}
+\ManabiDifficulty{標準}
+\ManabiMinutes{15}
+
+\begin{document}
+\ManabiMakeTitle
+
+\begin{mnbproblem}[(配点 20)]{1}
+太郎さんは、長さ $20\,\mathrm{m}$ のフェンスをちょうど使い切って、
+長方形の花壇を作ることにした。花壇の 4 つの辺すべてをフェンスで囲むとき、
+隣り合う 2 辺の長さを $x\,\mathrm{m}$ と $(10 - x)\,\mathrm{m}$ と表せる。
+花壇の面積を $y\,\mathrm{m}^2$ とする。
+
+\begin{mnbparts}
+  \item $y$ を $x$ の式で表すと
+    \[
+      y = -x^2 + \mnbans{アイ}\, x
+    \]
+    である。また、$x$ のとり得る値の範囲は $0 < x < \mnbans{ウエ}$ である。
+
+  \item $y$ は $x = \mnbans{オ}$ のとき最大値 $\mnbans{カキ}$ をとる。
+
+  \item 通路を確保するため、$x$ の範囲を $2 \le x \le 4$ に制限する。
+    このとき、$y$ は $x = \mnbans{ク}$ のとき最大値 $\mnbans{ケコ}$ をとる。
+
+  \item (3) の範囲 $2 \le x \le 4$ において、$y$ が最小となる $x$ の値として
+    正しいものを、次の \mnbcircled{1}~$\sim$~\mnbcircled{4} のうちから一つ選べ。
+    解答欄: \mnbans{サ}
+
+    \begin{mnbchoices}
+      \item $x = 2$
+      \item $x = 3$
+      \item $x = 4$
+      \item 最小となる $x$ の値はない
+    \end{mnbchoices}
+\end{mnbparts}
+\end{mnbproblem}
+
+\ManabiSolutionPart
+
+\begin{mnbparts}
+  \item 長方形の周の長さが $20\,\mathrm{m}$ なので、隣り合う 2 辺の和は
+    $10\,\mathrm{m}$ である。よって 2 辺は $x$ と $10 - x$ であり、
+    \[
+      y = x(10 - x) = -x^2 + 10x.
+    \]
+    辺の長さは正であるから $x > 0$ かつ $10 - x > 0$、すなわち
+    $0 < x < 10$。\quad(\mnbans{アイ} $= 10$、\mnbans{ウエ} $= 10$)
+
+  \item 平方完成すると $y = -(x - 5)^2 + 25$。グラフは上に凸で頂点は
+    $(5,\ 25)$、頂点は定義域 $0 < x < 10$ に含まれる。よって
+    $x = 5$ のとき最大値 $25$。\quad(\mnbans{オ} $= 5$、\mnbans{カキ} $= 25$)
+
+  \item 頂点の $x$ 座標 $5$ は範囲 $2 \le x \le 4$ に含まれない。
+    この範囲では $y$ は増加するから、右端 $x = 4$ で最大となり
+    $y = -(4)^2 + 10 \cdot 4 = 24$。\quad(\mnbans{ク} $= 4$、\mnbans{ケコ} $= 24$)
+
+  \item (3) と同様に、$2 \le x \le 4$ で $y$ は増加するから、最小は左端
+    $x = 2$ でとり $y = -(2)^2 + 10 \cdot 2 = 16$。正解は \mnbcircled{1}。
+    \quad(\mnbans{サ} $= 1$)
+
+    \textbf{誤答の傾向}: \mnbcircled{3} は最大と最小の位置の取り違え、
+    \mnbcircled{2} は「中央で最小」という誤解、\mnbcircled{4} は閉区間で
+    端点が最小値を与えることの見落としによる。
+\end{mnbparts}
+
+\end{document}

@@ -1,0 +1,49 @@
+schema_version: "1.0"
+id: math1-qf-common-0001
+version: 0.1.0
+title: 二次関数の最大・最小(演習)
+language: ja
+status: draft
+
+classification:
+  school_level: high-school
+  subject: mathematics
+  course: mathematics-i
+  units:
+    - quadratic-functions
+  format: common-test-style
+  difficulty: standard
+  estimated_minutes: 15
+  audience:
+    - learner
+
+curriculum:
+  snapshot: mext-84V10-2026-08
+  codes:
+    - 84V10-math-i-quadratic-functions
+    - 84V10-math-i-qf-max-min
+  alignment_status: pending
+
+artifacts:
+  problem_pdf: null
+  answer_sheet_pdf: null
+  solution_pdf: null
+  source_bundle: null
+
+validation:
+  schema: pending
+  tex: pending
+  mathematics: pending
+  curriculum: pending
+  editorial: pending
+  visual: pending
+  rights: pending
+
+license:
+  content: CC-BY-4.0
+  code: Apache-2.0
+
+provenance:
+  ai_assisted: true
+  origin: original
+  source_text_included: false
