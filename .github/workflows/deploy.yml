@@ -36,6 +36,20 @@ jobs:
         working-directory: python
         run: uv run manabi catalog build
 
+      - name: Mirror published PDFs for same-origin preview
+        # GitHub Release アセットは CORS ヘッダを返さないため、PDF.js の
+        # fetch 用に公開 PDF をサイト内(web/public/artifacts/)へミラーする
+        # (spec §17.5「same-origin or properly configured CORS」)。
+        # ダウンロードリンク自体はリリース URL(正本)のまま。
+        run: |
+          set -eu
+          mkdir -p web/public/artifacts
+          jq -r '.materials[].artifacts | (.problem_pdf // empty), (.answer_sheet_pdf // empty), (.solution_pdf // empty)' \
+            web/public/catalog.json | while read -r url; do
+            echo "mirroring ${url}"
+            curl -sSfL --retry 3 -o "web/public/artifacts/$(basename "$url")" "$url"
+          done
+
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5

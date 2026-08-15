@@ -69,4 +69,27 @@ describe("PdfPreview", () => {
       screen.getByRole("link", { name: "問題 をダウンロード" })
     ).toBeInTheDocument()
   })
+
+  it("downloads from the canonical URL while previewing the mirror", async () => {
+    loadPdfDocument.mockResolvedValue({ numPages: 1 })
+    renderPageToCanvas.mockResolvedValue(undefined)
+
+    render(
+      <PdfPreview
+        url="/artifacts/p.pdf"
+        downloadHref="https://github.com/nishide-dev/manabi-forge/releases/download/t/p.pdf"
+        title="問題"
+      />
+    )
+    await screen.findByText("1 / 1 ページ")
+
+    // プレビューは same-origin ミラー、ダウンロードはリリース URL(正本)
+    expect(loadPdfDocument).toHaveBeenCalledWith("/artifacts/p.pdf")
+    expect(
+      screen.getByRole("link", { name: "問題 をダウンロード" })
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/nishide-dev/manabi-forge/releases/download/t/p.pdf"
+    )
+  })
 })
