@@ -1,0 +1,168 @@
+{
+  "$defs": {
+    "Finding": {
+      "additionalProperties": false,
+      "description": "One structured review finding (spec §11.5, severities in §14.1).",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "location": {
+          "minLength": 1,
+          "title": "Location",
+          "type": "string"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "suggested_action": {
+          "default": "",
+          "title": "Suggested Action",
+          "type": "string"
+        }
+      },
+      "required": [
+        "severity",
+        "location",
+        "code",
+        "message"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "ReviewResult": {
+      "description": "Outcome of a single review (spec §11.5, Appendix C).",
+      "enum": [
+        "passed",
+        "changes-requested",
+        "escalated"
+      ],
+      "title": "ReviewResult",
+      "type": "string"
+    },
+    "ReviewType": {
+      "description": "Review specialties recorded as separate review records (spec §13).",
+      "enum": [
+        "mathematics",
+        "curriculum",
+        "editorial",
+        "visual",
+        "rights"
+      ],
+      "title": "ReviewType",
+      "type": "string"
+    },
+    "Reviewer": {
+      "additionalProperties": false,
+      "description": "Who performed the review.\n\n自動レビューはツール名とバージョンを識別し、人間レビューと偽装しない\n(spec §11.5)。",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/ReviewerKind"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "tool_version": {
+          "default": "",
+          "title": "Tool Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "title": "Reviewer",
+      "type": "object"
+    },
+    "ReviewerKind": {
+      "description": "Who performed a review. 自動レビューは人間レビューと偽装しない(spec §11.5).",
+      "enum": [
+        "human",
+        "automated"
+      ],
+      "title": "ReviewerKind",
+      "type": "string"
+    },
+    "Severity": {
+      "description": "Finding severity levels and their publication effect (spec §14.1).",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "note"
+      ],
+      "title": "Severity",
+      "type": "string"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/review.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One immutable review of a material at a specific commit (spec §11.5).\n\n正式レビュー中に教材を書き換えてはならない。指摘はこのレコードとして残す。",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "material_id": {
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-\\d{4}$",
+      "title": "Material Id",
+      "type": "string"
+    },
+    "result": {
+      "$ref": "#/$defs/ReviewResult"
+    },
+    "review_id": {
+      "minLength": 1,
+      "title": "Review Id",
+      "type": "string"
+    },
+    "review_type": {
+      "$ref": "#/$defs/ReviewType"
+    },
+    "reviewed_commit": {
+      "pattern": "^[0-9a-f]{7,40}$",
+      "title": "Reviewed Commit",
+      "type": "string"
+    },
+    "reviewer": {
+      "$ref": "#/$defs/Reviewer"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "minLength": 1,
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "material_id",
+    "review_id",
+    "review_type",
+    "reviewer",
+    "reviewed_commit",
+    "result",
+    "created_at"
+  ],
+  "title": "ReviewRecord",
+  "type": "object"
+}

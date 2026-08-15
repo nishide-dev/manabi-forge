@@ -1,0 +1,135 @@
+{
+  "$defs": {
+    "CheckStatus": {
+      "description": "State of one validation or review dimension (spec §11.3).",
+      "enum": [
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "title": "CheckStatus",
+      "type": "string"
+    },
+    "ReleaseArtifact": {
+      "additionalProperties": false,
+      "description": "One published artifact with its checksum (spec §18.2).",
+      "properties": {
+        "filename": {
+          "minLength": 1,
+          "title": "Filename",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "filename",
+        "sha256"
+      ],
+      "title": "ReleaseArtifact",
+      "type": "object"
+    },
+    "ReviewType": {
+      "description": "Review specialties recorded as separate review records (spec §13).",
+      "enum": [
+        "mathematics",
+        "curriculum",
+        "editorial",
+        "visual",
+        "rights"
+      ],
+      "title": "ReviewType",
+      "type": "string"
+    },
+    "TemplateRef": {
+      "additionalProperties": false,
+      "description": "Template identity and version recorded in every artifact (spec §15.3).",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "title": "TemplateRef",
+      "type": "object"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/release.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Manifest describing one immutable material release (spec §18, Appendix B).",
+  "properties": {
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/ReleaseArtifact"
+      },
+      "minItems": 1,
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "curriculumSnapshot": {
+      "minLength": 1,
+      "title": "Curriculumsnapshot",
+      "type": "string"
+    },
+    "materialId": {
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-\\d{4}$",
+      "title": "Materialid",
+      "type": "string"
+    },
+    "materialVersion": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Materialversion",
+      "type": "string"
+    },
+    "reviews": {
+      "additionalProperties": {
+        "$ref": "#/$defs/CheckStatus"
+      },
+      "description": "レビュー種別ごとの結果。公開には全必須レビューの passed が必要。",
+      "propertyNames": {
+        "$ref": "#/$defs/ReviewType"
+      },
+      "title": "Reviews",
+      "type": "object"
+    },
+    "sourceCommit": {
+      "pattern": "^[0-9a-f]{7,40}$",
+      "title": "Sourcecommit",
+      "type": "string"
+    },
+    "template": {
+      "$ref": "#/$defs/TemplateRef"
+    }
+  },
+  "required": [
+    "materialId",
+    "materialVersion",
+    "sourceCommit",
+    "curriculumSnapshot",
+    "template",
+    "reviews",
+    "artifacts"
+  ],
+  "title": "ReleaseManifest",
+  "type": "object"
+}
