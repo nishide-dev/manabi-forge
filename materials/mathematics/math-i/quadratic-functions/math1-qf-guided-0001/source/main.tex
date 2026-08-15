@@ -1,0 +1,91 @@
+%% math1-qf-guided-0001 — 二次関数の最大・最小(定義域つき)
+%% Manabi Forge contributors による独自制作の非公式教材。
+%% コンテンツライセンス: CC BY 4.0(リポジトリルートの LICENSE-CONTENT)
+\documentclass[guided-example]{manabi}
+
+\ManabiId{math1-qf-guided-0001}
+\ManabiVersion{0.1.0}
+\ManabiTitle{二次関数の最大・最小}
+\ManabiCourse{数学I}
+\ManabiUnit{二次関数}
+\ManabiDifficulty{標準}
+\ManabiMinutes{15}
+
+\begin{document}
+\ManabiMakeTitle
+
+\begin{mnbconcept}[: 平方完成と頂点]
+二次関数 $y = ax^2 + bx + c$($a \neq 0$)は、平方完成により
+\[
+  y = a(x - p)^2 + q
+\]
+の形に変形できる。このときグラフの頂点は $(p,\, q)$ である。
+
+定義域 $\alpha \le x \le \beta$ が与えられたときの最大値・最小値は、
+\textbf{頂点の $x$ 座標 $p$ が定義域に含まれるかどうか}で場合が分かれる。
+\begin{itemize}[leftmargin=1.6em]
+  \item $p$ が定義域に含まれる場合: 頂点で最小(下に凸)または最大(上に凸)となる。
+  \item もう一方の極値は、頂点から遠い側の端点でとる。
+  \item $p$ が定義域に含まれない場合: 最大値・最小値はともに端点でとる。
+\end{itemize}
+\end{mnbconcept}
+
+\begin{mnbexample}
+関数 $y = x^2 - 4x + 5$($0 \le x \le 3$)の最大値と最小値を求めよ。
+\end{mnbexample}
+
+\begin{mnbstrategy}
+\begin{enumerate}[leftmargin=1.8em]
+  \item 平方完成して頂点を求める。
+  \item 頂点の $x$ 座標が定義域 $0 \le x \le 3$ に含まれるか確認する。
+  \item 頂点と両端点 $x = 0,\ 3$ での値を比較する。
+\end{enumerate}
+\end{mnbstrategy}
+
+\begin{mnbsolution}
+平方完成すると
+\[
+  y = x^2 - 4x + 5 = (x - 2)^2 + 1
+\]
+であるから、グラフは下に凸で、頂点は $(2,\, 1)$ である。
+
+頂点の $x$ 座標 $2$ は定義域 $0 \le x \le 3$ に含まれる。
+したがって最小値は頂点でとり、
+\[
+  x = 2 \text{ のとき最小値 } 1.
+\]
+
+最大値は頂点から遠い側の端点でとる。$|0 - 2| = 2 > |3 - 2| = 1$ より
+$x = 0$ の側が遠いので、端点での値
+\[
+  x = 0 \text{ のとき } y = 5, \qquad x = 3 \text{ のとき } y = 2
+\]
+を比較して、
+\[
+  x = 0 \text{ のとき最大値 } 5.
+\]
+
+よって、\textbf{最大値 $5$($x = 0$)、最小値 $1$($x = 2$)}である。
+\end{mnbsolution}
+
+\begin{mnbnote}
+定義域の中央 $\dfrac{0 + 3}{2} = \dfrac{3}{2}$ と頂点の $x$ 座標 $2$ を
+比較しても、どちらの端点が頂点から遠いかを判定できる
+(頂点が中央より右にあるので、左端 $x = 0$ が遠い)。
+
+なお、定義域が $0 \le x \le 1$ のように頂点を含まない場合は、
+最大値・最小値はともに端点でとる。定義域が変わると答えの場所が
+変わることに注意する。
+\end{mnbnote}
+
+\begin{mnbpractice}
+関数 $y = -x^2 + 2x + 2$($0 \le x \le 3$)の最大値と最小値を求めよ。
+
+\vspace{2pt}
+\begin{itemize}[leftmargin=1.6em]\small
+  \item ヒント: 上に凸の場合、頂点でとるのは最大値である。
+  \item 答え: 最大値 $3$($x = 1$)、最小値 $-1$($x = 3$)。
+\end{itemize}
+\end{mnbpractice}
+
+\end{document}

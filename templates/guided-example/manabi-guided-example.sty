@@ -1,0 +1,40 @@
+%% manabi-guided-example.sty — 段階解説型テンプレート(spec §15.2)
+%% 構成: 概念 → 例題 → 方針 → 解答 → 別解・注意 → 練習
+%% 視覚デザインは Manabi Forge 独自のものであり、市販参考書の誌面を模倣しない。
+%% グレースケール印刷でも判別できる濃度差のみで区別する(spec §15.2 worksheet 同様)。
+%% ライセンス: Apache-2.0(リポジトリルートの LICENSE-CODE)
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{manabi-guided-example}[2026/08/16 v0.1.0 Manabi Forge guided-example template]
+
+\ManabiTemplate{guided-example}{0.1.0}
+
+%% 共通ボックス様式(白背景・黒系フレームでグレースケール安全)
+\tcbset{
+  mnb@box/.style={
+    colback=white,
+    colframe=black!75,
+    coltitle=white,
+    colbacktitle=black!75,
+    boxrule=0.6pt,
+    arc=1.5pt,
+    left=7pt, right=7pt, top=6pt, bottom=6pt,
+    breakable,
+    fonttitle=\bfseries\small,
+    before skip=8pt, after skip=8pt,
+  },
+}
+
+%% 各環境は任意引数で小見出しを追加できる: \begin{mnbconcept}[: 平方完成]
+\newtcolorbox{mnbconcept}[1][]{mnb@box, colframe=black!60, colbacktitle=black!60,
+  title={概念#1}}
+\newtcolorbox{mnbexample}[1][]{mnb@box, colframe=black!85, colbacktitle=black!85,
+  title={例題#1}}
+\newtcolorbox{mnbstrategy}[1][]{mnb@box, colframe=black!45, colbacktitle=black!45,
+  title={方針#1}}
+\newtcolorbox{mnbsolution}[1][]{mnb@box, title={解答#1}}
+\newtcolorbox{mnbnote}[1][]{mnb@box, colframe=black!35, colbacktitle=white,
+  coltitle=black, title={別解・注意#1}}
+\newtcolorbox{mnbpractice}[1][]{mnb@box, colframe=black!85, colbacktitle=black!85,
+  title={練習#1}}
+
+\endinput
