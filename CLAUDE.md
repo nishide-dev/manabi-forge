@@ -16,17 +16,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 現在の状態
 
-Phase 0(基盤)と Phase 1 vertical slice の大部分が完了:
+**Phase 1 vertical slice 完了**: 教材 2 件(math1-qf-guided-0001 / math1-qf-common-0001)が全レビュー通過 → `published` で、https://nishide-dev.github.io/manabi-forge/ に公開中。
 
 - Pydantic モデル + JSON Schema 生成(`schemas/` はモデルから生成、CI で差分検査)
-- guided-example / common-test テンプレートと draft 教材 2 件(`manabi tex build` でローカルビルド可能。CI には TeX なし → #11)
-- カリキュラム正規レコード(数学I 二次関数)と教材コード解決チェック
-- 公開カタログ生成(承認済みのみ。dev は `--include-drafts`)と Manabi Library の カタログ/詳細ページ
-- GitHub Pages 自動デプロイ: https://nishide-dev.github.io/manabi-forge/ (公開カタログは教材が approved になるまで空)
+- 数学検証 `manabi verify math`: SymPy による厳密検証。検証式は安全な文法(x・数字・四則・べき・括弧のみ)に制限され、周期関数等は表現不能、極を含む区間は escalated
+- レビューは `reviews/*.yaml` に構造化記録。エージェントによるレビューは必ず `kind: automated`(人間と偽装しない)。`published`/`approved` への遷移は Maintainer の明示的な承認が必要(ADR-004)
+- リリース: `manabi release prepare` → 教材ごとのタグ付き GitHub Release(problem.pdf / source.zip / manifest.json / SHA256SUMS)。公開済みアセットは不変、修正は新バージョン
+- デプロイ(main push 時): 公開カタログ生成 → **公開 PDF を web/public/artifacts/ にミラー**(Release アセットは CORS 非対応のため、PDF.js プレビューは same-origin ミラーから読む。ダウンロードリンクはリリース URL が正本)→ Pages 配信
+- CI 3 本: CI(lint/型/テスト/スキーマ/教材/カリキュラム検証)、Material Build(ピン留め TeX Live コンテナで全教材実ビルド)、Deploy Library
 
-次: 数学検証 `manabi verify math`(#20)、人間レビューの記録と approved 遷移(#21)、リリースアセット + PDF.js プレビュー(#19)、TeX Live CI コンテナ(#11)。
+次の候補: 教材の拡充(Phase 6)、解答用紙テンプレート、curriculum 84V10 正式コード取込(Phase 2 続き)、カリキュラムマップ/ポリシーページ(spec §17.1)。
 
-**注意**: `web/public/catalog.json` は生成物(`manabi catalog build --include-drafts`)。手書き編集せず、Biome の対象からも除外されている。教材の status を変えたら再生成する。
+**注意**: `web/public/catalog.json` は生成物(`manabi catalog build`)。手書き編集せず、Biome の対象からも除外されている。教材の status を変えたら再生成する。
 
 ## コミット・Issue・PR の言語規則
 
