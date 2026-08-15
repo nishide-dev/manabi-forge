@@ -53,6 +53,53 @@ class Accessibility(BaseModel):
     figure_descriptions: list[NonEmptyStr] = Field(default_factory=list)
 
 
+class VerificationKind(StrEnum):
+    """Machine-checkable verification strategies (spec §13.4)."""
+
+    MAXIMUM = "maximum"
+    MINIMUM = "minimum"
+    VERTEX = "vertex"
+    EQUIVALENT = "equivalent"
+
+
+class VerificationCheck(BaseModel):
+    """One machine-checkable claim about the item (spec §13.4).
+
+    expression は変数 x の SymPy 可読な式。domain は閉区間 [a, b]、
+    None は実数全体を表す。ここに載らない主張は自動検証の対象外として
+    人間レビューへ明示的にエスカレートされる。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: NonEmptyStr
+    kind: VerificationKind
+    expression: NonEmptyStr
+    domain: tuple[float, float] | None = None
+    expected_x: float | None = None
+    expected_value: float | None = None
+    rhs: str | None = None
+
+    @model_validator(mode="after")
+    def _fields_match_kind(self) -> VerificationCheck:
+        """Require the fields each verification kind needs."""
+        needs_extrema = self.kind in {
+            VerificationKind.MAXIMUM,
+            VerificationKind.MINIMUM,
+            VerificationKind.VERTEX,
+        }
+        if needs_extrema and (self.expected_x is None or self.expected_value is None):
+            msg = f"check {self.id}: {self.kind.value} requires expected_x and expected_value"
+            raise ValueError(msg)
+        if self.kind is VerificationKind.EQUIVALENT and not self.rhs:
+            msg = f"check {self.id}: equivalent requires rhs"
+            raise ValueError(msg)
+        if self.domain is not None and self.domain[0] >= self.domain[1]:
+            msg = f"check {self.id}: domain must satisfy a < b"
+            raise ValueError(msg)
+        return self
+
+
 class ItemPart(BaseModel):
     """One part of a multi-part item."""
 
@@ -115,6 +162,7 @@ class ItemSpec(BaseModel):
 
     source_data: list[SourceData] = Field(default_factory=list)
     accessibility: Accessibility = Field(default_factory=Accessibility)
+    verification_checks: list[VerificationCheck] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _part_ids_unique(self) -> ItemSpec:

@@ -60,3 +60,32 @@ source_data: []
 accessibility:
   figure_descriptions:
     - 図は使用していない。状況は本文のみで完結する。
+
+# 機械検証可能な主張(manabi verify math が SymPy で検証する。spec §13.4)
+verification_checks:
+  - id: area-expansion
+    kind: equivalent
+    expression: "x*(10 - x)"
+    rhs: "-x**2 + 10*x"
+  - id: global-max
+    kind: maximum
+    expression: "-x**2 + 10*x"
+    expected_x: 5
+    expected_value: 25
+  - id: vertex
+    kind: vertex
+    expression: "-x**2 + 10*x"
+    expected_x: 5
+    expected_value: 25
+  - id: restricted-max
+    kind: maximum
+    expression: "-x**2 + 10*x"
+    domain: [2, 4]
+    expected_x: 4
+    expected_value: 24
+  - id: restricted-min
+    kind: minimum
+    expression: "-x**2 + 10*x"
+    domain: [2, 4]
+    expected_x: 2
+    expected_value: 16
