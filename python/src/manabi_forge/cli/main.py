@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Annotated
 import typer
 
 from manabi_forge import __version__
+from manabi_forge.cli.catalog import app as catalog_app
 from manabi_forge.cli.curriculum import app as curriculum_app
 from manabi_forge.cli.material import app as material_app
 from manabi_forge.cli.schemas import app as schemas_app
@@ -29,6 +30,7 @@ app = typer.Typer(
     help="Curriculum-aware tools for creating reliable learning materials.",
     no_args_is_help=True,
 )
+app.add_typer(catalog_app)
 app.add_typer(curriculum_app)
 app.add_typer(material_app)
 app.add_typer(schemas_app)
