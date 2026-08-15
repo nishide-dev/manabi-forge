@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 3 層構成(意図的に分離):
 
-- **Manabi Core** (`python/`): カリキュラム取込・教材バリデーション・数学検証・レビュー・TeX レンダリング・カタログ生成。uv 管理の単一 Python プロジェクト。CLI 名は `manabi`(現在は `doctor` / `version` のみ実装)。
+- **Manabi Core** (`python/`): カリキュラム取込・教材バリデーション・数学検証・レビュー・TeX レンダリング・カタログ生成。uv 管理の単一 Python プロジェクト。CLI 名は `manabi`(実装済み: `doctor` / `version` / `schemas generate|check` / `material validate` / `tex build` / `curriculum validate|query` / `catalog build`)。
 - **Manabi Skills** (`skills/`): エージェント向けの移植可能な Agent Skills(SKILL.md + references + scripts)。Phase 3 で実装予定。
 - **Manabi Library** (`web/`): React + Vite の静的サイト。検索・フィルタ・PDF プレビュー・ダウンロード。バックエンドなし、生成済み静的 JSON(catalog.json)を読むだけ。
 
@@ -16,7 +16,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 現在の状態
 
-Phase 0(リポジトリ基盤)完了。次は spec §24–25, §30 の順で: Pydantic モデル(material/item/review/provenance)→ JSON Schema 生成 → TeX vertical slice(guided-example と common-test の各 1 教材)→ カリキュラムスナップショット → カタログ生成と Library ページ。
+Phase 0(基盤)と Phase 1 vertical slice の大部分が完了:
+
+- Pydantic モデル + JSON Schema 生成(`schemas/` はモデルから生成、CI で差分検査)
+- guided-example / common-test テンプレートと draft 教材 2 件(`manabi tex build` でローカルビルド可能。CI には TeX なし → #11)
+- カリキュラム正規レコード(数学I 二次関数)と教材コード解決チェック
+- 公開カタログ生成(承認済みのみ。dev は `--include-drafts`)と Manabi Library の カタログ/詳細ページ
+- GitHub Pages 自動デプロイ: https://nishide-dev.github.io/manabi-forge/ (公開カタログは教材が approved になるまで空)
+
+次: 数学検証 `manabi verify math`(#20)、人間レビューの記録と approved 遷移(#21)、リリースアセット + PDF.js プレビュー(#19)、TeX Live CI コンテナ(#11)。
+
+**注意**: `web/public/catalog.json` は生成物(`manabi catalog build --include-drafts`)。手書き編集せず、Biome の対象からも除外されている。教材の status を変えたら再生成する。
 
 ## コミット・Issue・PR の言語規則
 
