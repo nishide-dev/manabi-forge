@@ -120,6 +120,11 @@ def test_build_timeout_returns_failed_result(monkeypatch, tmp_path):
         raise subprocess.TimeoutExpired(cmd="latexmk", timeout=1, output=b"partial")
 
     material = make_plain_material(tmp_path, "x")
+    # TeX がない CI 環境でも動くよう、latexmk の解決と実行を両方モックする
+    monkeypatch.setattr(
+        "manabi_forge.tex.build.shutil.which",
+        lambda _name: "/usr/bin/latexmk",
+    )
     monkeypatch.setattr("manabi_forge.tex.build.subprocess.run", raise_timeout)
     result = build_material(material, out_root=tmp_path / "build")
     assert not result.ok
