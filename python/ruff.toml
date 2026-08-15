@@ -41,7 +41,8 @@ runtime-evaluated-decorators = ["typer.Typer.command"]
   "ANN001",
   "ANN201",
   "D",
-  "INP001", # pytest のテストディレクトリは __init__.py を持たない
+  "INP001",  # pytest のテストディレクトリは __init__.py を持たない
+  "PLR2004", # テストの期待値リテラルは自明であり定数化は可読性を下げる
   "S101",
 ]
 
