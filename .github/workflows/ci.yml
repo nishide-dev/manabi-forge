@@ -92,6 +92,10 @@ jobs:
         # コミット済みの全教材が構造的に妥当であること(spec §13.3 Stage C)
         run: uv run manabi material validate
 
+      - name: Curriculum validation
+        # 正規レコードの妥当性と、全教材のコード解決(spec §24 Phase 2)
+        run: uv run manabi curriculum validate
+
       - name: CLI smoke test
         run: |
           uv run manabi version

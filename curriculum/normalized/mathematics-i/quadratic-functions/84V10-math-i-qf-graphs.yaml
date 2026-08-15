@@ -1,0 +1,27 @@
+code: 84V10-math-i-qf-graphs
+source_version: 84V10
+school_level: high-school
+subject: mathematics
+course: mathematics-i
+path:
+  - quadratic-functions
+  - graphs-of-quadratic-functions
+statement_ja: >-
+  二次関数のグラフを平方完成を用いてかき、頂点・軸・凸の向きなど
+  グラフの特徴を座標平面上で捉えられるようにする(maintainer 要約)。
+objective_dimensions:
+  - knowledge-and-skills
+prerequisites:
+  - junior-high-function-y-equals-ax-squared
+scope_notes:
+  - 平行移動によるグラフの対応関係を含む
+restrictions: []
+source_refs:
+  - id: mext-course-of-study-2018-math
+    locator: 高等学校学習指導要領(平成30年告示)数学I 2内容 (3)二次関数 ア(ア)
+uncertainty_notes:
+  - 細目の粒度は解説文書の取込後に見直す。code はプロジェクト暫定 ID。
+review:
+  status: pending
+  reviewed_by: ""
+  reviewed_at: null

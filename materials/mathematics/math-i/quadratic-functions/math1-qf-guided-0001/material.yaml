@@ -20,8 +20,9 @@ classification:
 curriculum:
   snapshot: mext-84V10-2026-08
   codes:
-    # 正式なコードは curriculum/ 取込(issue #4)後に正規レコードへ解決する
+    # curriculum/normalized/ の正規レコードに解決される(manabi curriculum validate)
     - 84V10-math-i-quadratic-functions
+    - 84V10-math-i-qf-max-min
   alignment_status: pending
 
 artifacts:
