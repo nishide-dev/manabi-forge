@@ -3,6 +3,7 @@
 // リリースアセット配布後に追加する。
 import { Link, useParams } from "react-router"
 
+import { PdfPreview } from "@/components/pdf-preview"
 import { difficultyLabel, formatLabel, statusLabel } from "@/lib/catalog"
 import { useCatalog } from "@/lib/catalog-context"
 
@@ -110,6 +111,18 @@ export function MaterialDetailPage() {
           ))}
         </div>
       </section>
+
+      {material.artifacts.problem_pdf && (
+        <section>
+          <h2 className="font-medium">プレビュー</h2>
+          <div className="mt-2">
+            <PdfPreview
+              url={material.artifacts.problem_pdf}
+              title={`${material.title}(問題 PDF)`}
+            />
+          </div>
+        </section>
+      )}
 
       <section>
         <h2 className="font-medium">ダウンロード</h2>
