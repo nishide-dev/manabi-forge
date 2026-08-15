@@ -1,6 +1,7 @@
 """Static catalog generation for Manabi Library (spec §18.1)."""
 
 from manabi_forge.catalog.build import (
+    CatalogBuildError,
     CatalogEntry,
     CatalogFile,
     build_catalog,
@@ -8,6 +9,7 @@ from manabi_forge.catalog.build import (
 )
 
 __all__ = [
+    "CatalogBuildError",
     "CatalogEntry",
     "CatalogFile",
     "build_catalog",

@@ -9,10 +9,12 @@ published の教材のみを掲載する(spec §18.1)。開発プレビュー用
 from __future__ import annotations
 
 import json
+from collections import Counter
 from typing import TYPE_CHECKING
+from urllib.parse import urlsplit
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from manabi_forge.cli.material import discover_material_dirs
 from manabi_forge.models import (
@@ -34,6 +36,10 @@ PUBLIC_STATUSES: frozenset[MaterialStatus] = frozenset(
 CATALOG_SCHEMA_VERSION = "1.0"
 
 
+class CatalogBuildError(ValueError):
+    """Raised when the materials tree cannot produce a valid public catalog."""
+
+
 class CatalogArtifacts(BaseModel):
     """Public artifact links (release assets), never local paths."""
 
@@ -43,6 +49,22 @@ class CatalogArtifacts(BaseModel):
     answer_sheet_pdf: str | None = None
     solution_pdf: str | None = None
     source_bundle: str | None = None
+
+    @field_validator("*")
+    @classmethod
+    def _public_https_url(cls, value: str | None) -> str | None:
+        """Reject anything but credential-free https URLs (spec §18.1).
+
+        マニフェスト由来の自由文字列がカタログへ素通りする唯一の経路なので、
+        ローカルパスや資格情報付き URL はここで遮断する。
+        """
+        if value is None:
+            return value
+        parsed = urlsplit(value)
+        if parsed.scheme != "https" or not parsed.hostname or parsed.username:
+            msg = f"artifact link must be a credential-free https URL, got {value!r}"
+            raise ValueError(msg)
+        return value
 
 
 class CatalogEntry(BaseModel):
@@ -113,12 +135,28 @@ def build_catalog(
     entries: list[CatalogEntry] = []
     for material_dir in discover_material_dirs(materials_root):
         manifest_path = material_dir / "material.yaml"
-        manifest = MaterialManifest.model_validate(
-            yaml.safe_load(manifest_path.read_text(encoding="utf-8")),
-        )
-        if not include_drafts and manifest.status not in PUBLIC_STATUSES:
-            continue
-        entries.append(_entry_from_manifest(manifest))
+        try:
+            manifest = MaterialManifest.model_validate(
+                yaml.safe_load(manifest_path.read_text(encoding="utf-8")),
+            )
+            if not include_drafts and manifest.status not in PUBLIC_STATUSES:
+                continue
+            entries.append(_entry_from_manifest(manifest))
+        except (ValidationError, yaml.YAMLError) as exc:
+            # どの教材が原因か分かるようパスを添えて失敗させる
+            msg = f"{manifest_path}: {exc}"
+            raise CatalogBuildError(msg) from exc
+
+    duplicates = sorted(
+        material_id
+        for material_id, count in Counter(entry.id for entry in entries).items()
+        if count > 1
+    )
+    if duplicates:
+        # 重複 ID は Web 側で片方が到達不能になるため許容しない
+        msg = f"duplicate material ids: {duplicates}"
+        raise CatalogBuildError(msg)
+
     entries.sort(key=lambda entry: entry.id)
     return CatalogFile(includes_drafts=include_drafts, materials=entries)
 
