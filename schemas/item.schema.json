@@ -1,0 +1,209 @@
+{
+  "$defs": {
+    "Accessibility": {
+      "additionalProperties": false,
+      "description": "Accessibility descriptions for figures and data (spec §11.4, §17.7).",
+      "properties": {
+        "figure_descriptions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Figure Descriptions",
+          "type": "array"
+        }
+      },
+      "title": "Accessibility",
+      "type": "object"
+    },
+    "AnswerType": {
+      "description": "How a part is answered.",
+      "enum": [
+        "multiple-choice",
+        "numeric",
+        "expression",
+        "short-answer",
+        "proof"
+      ],
+      "title": "AnswerType",
+      "type": "string"
+    },
+    "Choice": {
+      "additionalProperties": false,
+      "description": "One answer choice, with distractor rationale where applicable.",
+      "properties": {
+        "is_correct": {
+          "default": false,
+          "title": "Is Correct",
+          "type": "boolean"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "rationale": {
+          "default": "",
+          "title": "Rationale",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "text"
+      ],
+      "title": "Choice",
+      "type": "object"
+    },
+    "ItemPart": {
+      "additionalProperties": false,
+      "description": "One part of a multi-part item.",
+      "properties": {
+        "answer_type": {
+          "$ref": "#/$defs/AnswerType"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/$defs/Choice"
+          },
+          "title": "Choices",
+          "type": "array"
+        },
+        "correct_answer": {
+          "minLength": 1,
+          "title": "Correct Answer",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "prompt": {
+          "minLength": 1,
+          "title": "Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "answer_type",
+        "correct_answer"
+      ],
+      "title": "ItemPart",
+      "type": "object"
+    },
+    "SourceData": {
+      "additionalProperties": false,
+      "description": "External source data used by the item, with license (spec §11.4, §20).",
+      "properties": {
+        "attribution": {
+          "default": "",
+          "title": "Attribution",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "license": {
+          "minLength": 1,
+          "title": "License",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "license"
+      ],
+      "title": "SourceData",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Semantic structure of one problem (``item.yaml``, spec §11.4).",
+  "properties": {
+    "accessibility": {
+      "$ref": "#/$defs/Accessibility"
+    },
+    "intended_reasoning": {
+      "minLength": 1,
+      "title": "Intended Reasoning",
+      "type": "string"
+    },
+    "material_id": {
+      "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\\d{4}$",
+      "title": "Material Id",
+      "type": "string"
+    },
+    "parts": {
+      "items": {
+        "$ref": "#/$defs/ItemPart"
+      },
+      "minItems": 1,
+      "title": "Parts",
+      "type": "array"
+    },
+    "required_knowledge": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Knowledge",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "minLength": 1,
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "solution_outline": {
+      "minLength": 1,
+      "title": "Solution Outline",
+      "type": "string"
+    },
+    "source_data": {
+      "items": {
+        "$ref": "#/$defs/SourceData"
+      },
+      "title": "Source Data",
+      "type": "array"
+    },
+    "stem": {
+      "minLength": 1,
+      "title": "Stem",
+      "type": "string"
+    },
+    "verification_strategy": {
+      "minLength": 1,
+      "title": "Verification Strategy",
+      "type": "string"
+    }
+  },
+  "required": [
+    "material_id",
+    "stem",
+    "parts",
+    "required_knowledge",
+    "intended_reasoning",
+    "solution_outline",
+    "verification_strategy"
+  ],
+  "title": "ItemSpec",
+  "type": "object"
+}

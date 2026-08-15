@@ -1,0 +1,134 @@
+{
+  "$defs": {
+    "AiStep": {
+      "additionalProperties": false,
+      "description": "One AI-assisted step. プロンプトはハッシュまたは要約のみ(spec §11.6).",
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "model": {
+          "default": "",
+          "title": "Model",
+          "type": "string"
+        },
+        "prompt_hash": {
+          "default": "",
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "prompt_summary": {
+          "default": "",
+          "title": "Prompt Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "AiStep",
+      "type": "object"
+    },
+    "CheckStatus": {
+      "description": "State of one validation or review dimension (spec §11.3).",
+      "enum": [
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "title": "CheckStatus",
+      "type": "string"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "One source dataset or document with its license.",
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "license": {
+          "minLength": 1,
+          "title": "License",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "license"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Full provenance of a material (``provenance.yaml``, spec §11.6).",
+  "properties": {
+    "ai_steps": {
+      "items": {
+        "$ref": "#/$defs/AiStep"
+      },
+      "title": "Ai Steps",
+      "type": "array"
+    },
+    "authors": {
+      "description": "人間の著者。編集責任のため最低 1 名(spec §20.5)。",
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Authors",
+      "type": "array"
+    },
+    "editors": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Editors",
+      "type": "array"
+    },
+    "material_id": {
+      "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\\d{4}$",
+      "title": "Material Id",
+      "type": "string"
+    },
+    "rights_review": {
+      "$ref": "#/$defs/CheckStatus",
+      "default": "pending"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "minLength": 1,
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "similarity_review": {
+      "$ref": "#/$defs/CheckStatus",
+      "default": "pending"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/SourceRef"
+      },
+      "title": "Sources",
+      "type": "array"
+    }
+  },
+  "required": [
+    "material_id",
+    "authors"
+  ],
+  "title": "ProvenanceRecord",
+  "type": "object"
+}

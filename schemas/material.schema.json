@@ -1,0 +1,352 @@
+{
+  "$defs": {
+    "AlignmentStatus": {
+      "description": "Curriculum alignment state of a material (spec §10.5, §11.3).",
+      "enum": [
+        "pending",
+        "aligned",
+        "needs-curriculum-review"
+      ],
+      "title": "AlignmentStatus",
+      "type": "string"
+    },
+    "Artifacts": {
+      "additionalProperties": false,
+      "description": "Release artifact references. PDF はリポジトリではなくリリースアセット(ADR-005).",
+      "properties": {
+        "answer_sheet_pdf": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Answer Sheet Pdf"
+        },
+        "problem_pdf": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Problem Pdf"
+        },
+        "solution_pdf": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Solution Pdf"
+        },
+        "source_bundle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Bundle"
+        }
+      },
+      "title": "Artifacts",
+      "type": "object"
+    },
+    "CheckStatus": {
+      "description": "State of one validation or review dimension (spec §11.3).",
+      "enum": [
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "title": "CheckStatus",
+      "type": "string"
+    },
+    "Classification": {
+      "additionalProperties": false,
+      "description": "Catalog classification of a material (spec §11.3, §17.2).",
+      "properties": {
+        "audience": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Audience",
+          "type": "array"
+        },
+        "course": {
+          "minLength": 1,
+          "title": "Course",
+          "type": "string"
+        },
+        "difficulty": {
+          "$ref": "#/$defs/Difficulty"
+        },
+        "estimated_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Estimated Minutes",
+          "type": "integer"
+        },
+        "format": {
+          "$ref": "#/$defs/MaterialFormat"
+        },
+        "school_level": {
+          "default": "high-school",
+          "minLength": 1,
+          "title": "School Level",
+          "type": "string"
+        },
+        "subject": {
+          "minLength": 1,
+          "title": "Subject",
+          "type": "string"
+        },
+        "units": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Units",
+          "type": "array"
+        }
+      },
+      "required": [
+        "subject",
+        "course",
+        "units",
+        "format",
+        "difficulty",
+        "estimated_minutes"
+      ],
+      "title": "Classification",
+      "type": "object"
+    },
+    "CurriculumAlignment": {
+      "additionalProperties": false,
+      "description": "Curriculum snapshot and codes a material cites (spec §10, §11.3).",
+      "properties": {
+        "alignment_status": {
+          "$ref": "#/$defs/AlignmentStatus",
+          "default": "pending"
+        },
+        "codes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Codes",
+          "type": "array"
+        },
+        "snapshot": {
+          "minLength": 1,
+          "title": "Snapshot",
+          "type": "string"
+        }
+      },
+      "required": [
+        "snapshot",
+        "codes"
+      ],
+      "title": "CurriculumAlignment",
+      "type": "object"
+    },
+    "Difficulty": {
+      "description": "Coarse difficulty scale for catalog filtering (spec §17.2).",
+      "enum": [
+        "basic",
+        "standard",
+        "advanced"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "LicenseInfo": {
+      "additionalProperties": false,
+      "description": "License split: content = CC BY 4.0, code = Apache-2.0 (spec §20.1).",
+      "properties": {
+        "code": {
+          "default": "Apache-2.0",
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "content": {
+          "default": "CC-BY-4.0",
+          "minLength": 1,
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "title": "LicenseInfo",
+      "type": "object"
+    },
+    "MaterialFormat": {
+      "description": "Publication formats. 商用シリーズ名は使用しない(spec §4.4).",
+      "enum": [
+        "common-test-style",
+        "guided-example",
+        "worksheet"
+      ],
+      "title": "MaterialFormat",
+      "type": "string"
+    },
+    "MaterialStatus": {
+      "description": "Material lifecycle states (spec §11.1).",
+      "enum": [
+        "draft",
+        "generated",
+        "structurally-valid",
+        "under-review",
+        "changes-requested",
+        "approved",
+        "published",
+        "revised",
+        "deprecated"
+      ],
+      "title": "MaterialStatus",
+      "type": "string"
+    },
+    "ProvenanceSummary": {
+      "additionalProperties": false,
+      "description": "Provenance flags surfaced in the manifest; details live in provenance.yaml.",
+      "properties": {
+        "ai_assisted": {
+          "title": "Ai Assisted",
+          "type": "boolean"
+        },
+        "origin": {
+          "default": "original",
+          "minLength": 1,
+          "title": "Origin",
+          "type": "string"
+        },
+        "source_text_included": {
+          "default": false,
+          "title": "Source Text Included",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ai_assisted"
+      ],
+      "title": "ProvenanceSummary",
+      "type": "object"
+    },
+    "ValidationState": {
+      "additionalProperties": false,
+      "description": "Per-dimension validation and review state (spec §11.3, §13).",
+      "properties": {
+        "curriculum": {
+          "$ref": "#/$defs/CheckStatus",
+          "default": "pending"
+        },
+        "editorial": {
+          "$ref": "#/$defs/CheckStatus",
+          "default": "pending"
+        },
+        "mathematics": {
+          "$ref": "#/$defs/CheckStatus",
+          "default": "pending"
+        },
+        "rights": {
+          "$ref": "#/$defs/CheckStatus",
+          "default": "pending"
+        },
+        "schema": {
+          "$ref": "#/$defs/CheckStatus",
+          "default": "pending"
+        },
+        "tex": {
+          "$ref": "#/$defs/CheckStatus",
+          "default": "pending"
+        },
+        "visual": {
+          "$ref": "#/$defs/CheckStatus",
+          "default": "pending"
+        }
+      },
+      "title": "ValidationState",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Canonical material manifest (``material.yaml``, spec §11.3).\n\n正本は PDF ではなくこのマニフェストと TeX ソース・レビュー/来歴レコード\nである(spec §6.2)。",
+  "properties": {
+    "artifacts": {
+      "$ref": "#/$defs/Artifacts"
+    },
+    "classification": {
+      "$ref": "#/$defs/Classification"
+    },
+    "curriculum": {
+      "$ref": "#/$defs/CurriculumAlignment"
+    },
+    "id": {
+      "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\\d{4}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "language": {
+      "default": "ja",
+      "minLength": 1,
+      "title": "Language",
+      "type": "string"
+    },
+    "license": {
+      "$ref": "#/$defs/LicenseInfo"
+    },
+    "provenance": {
+      "$ref": "#/$defs/ProvenanceSummary"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "minLength": 1,
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/MaterialStatus",
+      "default": "draft"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "validation": {
+      "$ref": "#/$defs/ValidationState"
+    },
+    "version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "title",
+    "classification",
+    "curriculum",
+    "provenance"
+  ],
+  "title": "MaterialManifest",
+  "type": "object"
+}

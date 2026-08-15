@@ -84,6 +84,10 @@ jobs:
       - name: Tests
         run: uv run pytest --cov --cov-report=term-missing
 
+      - name: Schema regeneration check
+        # コミット済み schemas/ がモデルから再生成した内容と一致すること(spec §9.3)
+        run: uv run manabi schemas check
+
       - name: CLI smoke test
         run: |
           uv run manabi version

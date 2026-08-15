@@ -25,6 +25,11 @@ fixable = ["ALL"]
 unfixable = []
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
+[lint.flake8-type-checking]
+# Pydantic は実行時にアノテーションを解決するため、モデルで使う型を
+# TYPE_CHECKING ブロックへ移動してはならない。
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+
 [lint.per-file-ignores]
 "src/manabi_forge/cli/**/*.py" = [
   "FBT001", # Typer のオプション定義は真偽値引数を必要とする

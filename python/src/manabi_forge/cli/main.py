@@ -11,12 +11,14 @@ from typing import TYPE_CHECKING, Annotated
 import typer
 
 from manabi_forge import __version__
+from manabi_forge.cli.schemas import app as schemas_app
 from manabi_forge.doctor import run_checks
 
 if TYPE_CHECKING:
     from manabi_forge.doctor import CheckResult
 
 EXIT_OK = 0
+EXIT_VALIDATION_FAILURE = 1
 EXIT_MISSING_DEPENDENCY = 3
 
 app = typer.Typer(
@@ -24,6 +26,7 @@ app = typer.Typer(
     help="Curriculum-aware tools for creating reliable learning materials.",
     no_args_is_help=True,
 )
+app.add_typer(schemas_app)
 
 
 @app.command()
