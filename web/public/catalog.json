@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_by": "sample (manabi catalog build 実装後に生成物へ置き換える: issue #5)",
+  "includes_drafts": true,
   "materials": [
     {
       "id": "math1-qf-guided-0001",

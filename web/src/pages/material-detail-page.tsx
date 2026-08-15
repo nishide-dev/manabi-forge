@@ -3,7 +3,7 @@
 // リリースアセット配布後に追加する。
 import { Link, useParams } from "react-router"
 
-import { DIFFICULTY_LABELS, FORMAT_LABELS } from "@/lib/catalog"
+import { difficultyLabel, formatLabel, statusLabel } from "@/lib/catalog"
 import { useCatalog } from "@/lib/catalog-context"
 
 const VALIDATION_LABELS: Record<string, string> = {
@@ -34,7 +34,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={`inline-flex rounded-md border px-2 py-0.5 text-xs ${style}`}
     >
-      {status}
+      {statusLabel(status)}
     </span>
   )
 }
@@ -72,7 +72,7 @@ export function MaterialDetailPage() {
         <Link className="text-muted-foreground text-sm underline" to="/catalog">
           ← カタログへ戻る
         </Link>
-        <h2 className="mt-2 font-semibold text-xl">{material.title}</h2>
+        <h1 className="mt-2 font-semibold text-xl">{material.title}</h1>
         <p className="mt-1 font-mono text-muted-foreground text-sm">
           {material.id} v{material.version}
         </p>
@@ -81,14 +81,14 @@ export function MaterialDetailPage() {
       <section className="grid gap-2 text-sm sm:grid-cols-2">
         <p>コース: {material.course}</p>
         <p>単元: {material.units.join(", ")}</p>
-        <p>形式: {FORMAT_LABELS[material.format]}</p>
-        <p>難易度: {DIFFICULTY_LABELS[material.difficulty]}</p>
+        <p>形式: {formatLabel(material.format)}</p>
+        <p>難易度: {difficultyLabel(material.difficulty)}</p>
         <p>目安時間: {material.estimated_minutes} 分</p>
         <p>状態: {material.status}</p>
       </section>
 
       <section>
-        <h3 className="font-medium">カリキュラム整合</h3>
+        <h2 className="font-medium">カリキュラム整合</h2>
         <p className="mt-1 text-muted-foreground text-sm">
           スナップショット: {material.curriculum_snapshot}
         </p>
@@ -100,7 +100,7 @@ export function MaterialDetailPage() {
       </section>
 
       <section>
-        <h3 className="font-medium">レビュー状態</h3>
+        <h2 className="font-medium">レビュー状態</h2>
         <div className="mt-2 flex flex-wrap gap-2">
           {Object.entries(material.validation).map(([key, status]) => (
             <span key={key} className="flex items-center gap-1 text-sm">
@@ -112,7 +112,7 @@ export function MaterialDetailPage() {
       </section>
 
       <section>
-        <h3 className="font-medium">ダウンロード</h3>
+        <h2 className="font-medium">ダウンロード</h2>
         <ul className="mt-2 flex flex-col gap-1 text-sm">
           {Object.entries(material.artifacts).map(([key, url]) => (
             <li key={key}>
@@ -131,7 +131,7 @@ export function MaterialDetailPage() {
       </section>
 
       <section className="text-muted-foreground text-sm">
-        <h3 className="font-medium text-foreground">来歴・ライセンス</h3>
+        <h2 className="font-medium text-foreground">来歴・ライセンス</h2>
         <p className="mt-1">
           AI 支援:{" "}
           {material.ai_assisted ? "あり(詳細は provenance を参照)" : "なし"}
@@ -141,7 +141,7 @@ export function MaterialDetailPage() {
           問題の誤りや曖昧さは{" "}
           <a
             className="underline"
-            href={`https://github.com/nishide-dev/manabi-forge/issues/new?title=[${material.id}] `}
+            href={`https://github.com/nishide-dev/manabi-forge/issues/new?title=${encodeURIComponent(`[${material.id}] `)}`}
           >
             GitHub Issue
           </a>{" "}

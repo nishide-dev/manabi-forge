@@ -4,13 +4,29 @@
 // 検索パラメータはハッシュ内で機能する。
 import { HashRouter, Link, Route, Routes } from "react-router"
 
-import { CatalogProvider } from "@/lib/catalog-context"
+import { CatalogProvider, useCatalog } from "@/lib/catalog-context"
 import { CatalogPage } from "@/pages/catalog-page"
 import { HomePage } from "@/pages/home-page"
 import { MaterialDetailPage } from "@/pages/material-detail-page"
 
 export const DISCLAIMER =
   "この教材は Manabi Forge contributors が独自に制作した非公式教材です。文部科学省、大学入試センター、教科書会社、参考書出版社その他の団体による公式教材ではありません。"
+
+function DraftPreviewBanner() {
+  const state = useCatalog()
+  if (state.status !== "ready" || !state.catalog.includes_drafts) {
+    return null
+  }
+  return (
+    <p
+      role="status"
+      className="border-b bg-muted px-6 py-2 text-muted-foreground text-xs"
+    >
+      開発プレビュー:
+      このカタログは未承認(draft)教材を含みます。公開版ではありません。
+    </p>
+  )
+}
 
 export function AppRoutes() {
   return (
@@ -31,6 +47,7 @@ export function AppRoutes() {
           </a>
         </nav>
       </header>
+      <DraftPreviewBanner />
 
       <main className="flex-1">
         <Routes>

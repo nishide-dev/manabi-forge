@@ -4,14 +4,16 @@ import { useSearchParams } from "react-router"
 
 import { MaterialCard } from "@/components/material-card"
 import {
-  DIFFICULTY_LABELS,
+  difficultyLabel,
   distinctValues,
-  FORMAT_LABELS,
   filterMaterials,
+  formatLabel,
 } from "@/lib/catalog"
 import { useCatalog } from "@/lib/catalog-context"
 
 const FILTER_KEYS = ["course", "unit", "format", "difficulty", "q"] as const
+
+type FilterKey = (typeof FILTER_KEYS)[number]
 
 function SelectFilter({
   label,
@@ -59,12 +61,17 @@ export function CatalogPage() {
   }
 
   const materials = state.catalog.materials
-  const filters = Object.fromEntries(
-    FILTER_KEYS.map((key) => [key, searchParams.get(key) ?? ""])
-  )
+  // FILTER_KEYS と 1:1 の明示的な型付け(キーの typo をコンパイルエラーにする)
+  const filters: Record<FilterKey, string> = {
+    course: searchParams.get("course") ?? "",
+    unit: searchParams.get("unit") ?? "",
+    format: searchParams.get("format") ?? "",
+    difficulty: searchParams.get("difficulty") ?? "",
+    q: searchParams.get("q") ?? "",
+  }
   const results = filterMaterials(materials, filters)
 
-  const setFilter = (key: string, value: string) => {
+  const setFilter = (key: FilterKey, value: string) => {
     setSearchParams(
       (previous) => {
         const next = new URLSearchParams(previous)
@@ -82,7 +89,7 @@ export function CatalogPage() {
   return (
     <div className="flex flex-col gap-6 p-6">
       <div>
-        <h2 className="font-semibold text-lg">教材カタログ</h2>
+        <h1 className="font-semibold text-lg">教材カタログ</h1>
         <p className="text-muted-foreground text-sm">
           フィルタ状態は URL に保存され、そのまま共有できます。
         </p>
@@ -112,7 +119,7 @@ export function CatalogPage() {
           value={filters.format}
           options={distinctValues(materials, (m) => [m.format]).map((v) => ({
             value: v,
-            label: FORMAT_LABELS[v],
+            label: formatLabel(v),
           }))}
           onChange={(v) => setFilter("format", v)}
         />
@@ -120,7 +127,7 @@ export function CatalogPage() {
           label="難易度"
           value={filters.difficulty}
           options={distinctValues(materials, (m) => [m.difficulty]).map(
-            (v) => ({ value: v, label: DIFFICULTY_LABELS[v] })
+            (v) => ({ value: v, label: difficultyLabel(v) })
           )}
           onChange={(v) => setFilter("difficulty", v)}
         />
@@ -136,7 +143,9 @@ export function CatalogPage() {
         </label>
       </div>
 
-      <p className="text-muted-foreground text-sm">{results.length} 件</p>
+      <p aria-live="polite" className="text-muted-foreground text-sm">
+        {results.length} 件
+      </p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {results.map((material) => (
           <MaterialCard key={material.id} material={material} />

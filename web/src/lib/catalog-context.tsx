@@ -22,6 +22,7 @@ export function CatalogProvider({
     preloaded ? { status: "ready", catalog: preloaded } : { status: "loading" }
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: preloaded はマウント時のシードデータであり、変更に追従しない(参照比較での再フェッチを防ぐ)
   React.useEffect(() => {
     if (preloaded) {
       return
@@ -44,7 +45,7 @@ export function CatalogProvider({
     return () => {
       cancelled = true
     }
-  }, [preloaded])
+  }, [])
 
   return (
     <CatalogContext.Provider value={state}>{children}</CatalogContext.Provider>

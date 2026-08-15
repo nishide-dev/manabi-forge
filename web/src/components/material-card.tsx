@@ -2,8 +2,9 @@ import { Link } from "react-router"
 
 import {
   type CatalogMaterial,
-  DIFFICULTY_LABELS,
-  FORMAT_LABELS,
+  difficultyLabel,
+  formatLabel,
+  reviewProgress,
 } from "@/lib/catalog"
 
 function Badge({ children }: { children: React.ReactNode }) {
@@ -15,10 +16,7 @@ function Badge({ children }: { children: React.ReactNode }) {
 }
 
 export function MaterialCard({ material }: { material: CatalogMaterial }) {
-  const passed = Object.values(material.validation).filter(
-    (status) => status === "passed"
-  ).length
-  const total = Object.keys(material.validation).length
+  const { passed, failed, total } = reviewProgress(material)
 
   return (
     <Link
@@ -35,12 +33,19 @@ export function MaterialCard({ material }: { material: CatalogMaterial }) {
         {material.course} / {material.units.join(", ")}
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
-        <Badge>{FORMAT_LABELS[material.format]}</Badge>
-        <Badge>難易度: {DIFFICULTY_LABELS[material.difficulty]}</Badge>
+        <Badge>{formatLabel(material.format)}</Badge>
+        <Badge>難易度: {difficultyLabel(material.difficulty)}</Badge>
         <Badge>目安 {material.estimated_minutes} 分</Badge>
         <Badge>
-          レビュー {passed}/{total}
+          レビュー合格 {passed}/{total}
         </Badge>
+        {failed > 0 && (
+          <Badge>
+            <span className="font-medium text-destructive">
+              不合格 {failed} 件
+            </span>
+          </Badge>
+        )}
         {material.status !== "published" && <Badge>{material.status}</Badge>}
       </div>
     </Link>

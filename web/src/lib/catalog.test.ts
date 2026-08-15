@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest"
 
 import {
   type CatalogMaterial,
+  difficultyLabel,
   distinctValues,
   filterMaterials,
+  formatLabel,
+  reviewProgress,
+  statusLabel,
 } from "@/lib/catalog"
 
 function makeMaterial(overrides: Partial<CatalogMaterial>): CatalogMaterial {
@@ -85,6 +89,30 @@ describe("filterMaterials", () => {
 
   it("ignores whitespace-only queries", () => {
     expect(filterMaterials(materials, { q: "  " })).toHaveLength(3)
+  })
+})
+
+describe("labels", () => {
+  it("translates known values and falls back to the raw slug", () => {
+    expect(formatLabel("guided-example")).toBe("段階解説型")
+    expect(formatLabel("drill-set")).toBe("drill-set")
+    expect(difficultyLabel("standard")).toBe("標準")
+    expect(difficultyLabel("expert")).toBe("expert")
+    expect(statusLabel("passed")).toBe("合格")
+    expect(statusLabel("unknown-status")).toBe("unknown-status")
+  })
+})
+
+describe("reviewProgress", () => {
+  it("uses the fixed expected check set as denominator", () => {
+    const material = makeMaterial({
+      validation: { schema: "passed", mathematics: "failed" },
+    })
+    expect(reviewProgress(material)).toEqual({
+      passed: 1,
+      failed: 1,
+      total: 7,
+    })
   })
 })
 

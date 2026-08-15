@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 export function HomePage() {
   return (
     <div className="flex max-w-2xl flex-col gap-4 p-6">
-      <h2 className="font-semibold text-2xl">Manabi Library</h2>
+      <h1 className="font-semibold text-2xl">Manabi Library</h1>
       <p className="text-sm leading-relaxed">
         学習指導要領に基づいて制作・検証された学習教材を、検索・プレビュー・
         ダウンロードできるオープンなライブラリです。すべての教材はソースから
