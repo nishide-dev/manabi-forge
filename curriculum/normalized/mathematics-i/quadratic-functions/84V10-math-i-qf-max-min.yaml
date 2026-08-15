@@ -1,0 +1,29 @@
+code: 84V10-math-i-qf-max-min
+source_version: 84V10
+school_level: high-school
+subject: mathematics
+course: mathematics-i
+path:
+  - quadratic-functions
+  - variation-of-quadratic-functions
+statement_ja: >-
+  二次関数の値の変化を調べ、定義域が制限された場合を含めて
+  最大値・最小値を求め、事象の考察に活用できるようにする(maintainer 要約)。
+objective_dimensions:
+  - knowledge-and-skills
+  - thinking-judgment-expression
+prerequisites:
+  - 84V10-math-i-qf-graphs
+scope_notes:
+  - 頂点が定義域に含まれるかどうかの場合分けを扱う
+  - 文字係数を含む場合分けの深入りは共通事項の範囲で調整する
+restrictions: []
+source_refs:
+  - id: mext-course-of-study-2018-math
+    locator: 高等学校学習指導要領(平成30年告示)数学I 2内容 (3)二次関数 ア(イ)・イ(ア)
+uncertainty_notes:
+  - 文字係数を含む最大・最小の扱いの深さは解説文書の記述確認まで暫定。code はプロジェクト暫定 ID。
+review:
+  status: pending
+  reviewed_by: ""
+  reviewed_at: null

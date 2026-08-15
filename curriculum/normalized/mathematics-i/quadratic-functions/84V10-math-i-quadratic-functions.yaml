@@ -1,0 +1,30 @@
+code: 84V10-math-i-quadratic-functions
+source_version: 84V10
+school_level: high-school
+subject: mathematics
+course: mathematics-i
+path:
+  - quadratic-functions
+statement_ja: >-
+  二次関数の概念を理解し、そのグラフの特徴、値の変化(増減)、
+  最大値・最小値、および二次方程式・二次不等式との関連を、
+  具体的な事象の考察に活用できるようにする(maintainer 要約)。
+objective_dimensions:
+  - knowledge-and-skills
+  - thinking-judgment-expression
+prerequisites:
+  - junior-high-function-y-equals-ax-squared
+  - junior-high-quadratic-equations
+scope_notes:
+  - 定義域が制限された場合の最大・最小を含む
+  - グラフとx軸の位置関係と二次不等式の解を関連付ける
+restrictions: []
+source_refs:
+  - id: mext-course-of-study-2018-math
+    locator: 高等学校学習指導要領(平成30年告示)第2章第4節数学 第2款第1 数学I 2内容 (3)二次関数
+uncertainty_notes:
+  - 84V10 コード表の細目コードとの正式対応付けは取込(issue #4 継続)まで暫定。code はプロジェクト暫定 ID。
+review:
+  status: pending
+  reviewed_by: ""
+  reviewed_at: null

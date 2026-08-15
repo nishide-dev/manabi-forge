@@ -1,0 +1,184 @@
+{
+  "$defs": {
+    "CurriculumReview": {
+      "additionalProperties": false,
+      "description": "Who reviewed this normalized record against the official text.",
+      "properties": {
+        "reviewed_at": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed At"
+        },
+        "reviewed_by": {
+          "default": "",
+          "title": "Reviewed By",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/CurriculumReviewStatus",
+          "default": "pending"
+        }
+      },
+      "title": "CurriculumReview",
+      "type": "object"
+    },
+    "CurriculumReviewStatus": {
+      "description": "Human review state of one normalized record (spec §10.4-10.5).",
+      "enum": [
+        "pending",
+        "reviewed"
+      ],
+      "title": "CurriculumReviewStatus",
+      "type": "string"
+    },
+    "CurriculumSourceRef": {
+      "additionalProperties": false,
+      "description": "Reference into an official source document (evidence, spec §10.6).",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "locator"
+      ],
+      "title": "CurriculumSourceRef",
+      "type": "object"
+    },
+    "ObjectiveDimension": {
+      "description": "学習指導要領の資質・能力の三つの柱.",
+      "enum": [
+        "knowledge-and-skills",
+        "thinking-judgment-expression",
+        "attitude-toward-learning"
+      ],
+      "title": "ObjectiveDimension",
+      "type": "string"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/curriculum.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One normalized curriculum record (spec §10.3).\n\nstatement_ja は maintainer による要約であり、公式文書の複製ではない。\n正確な文言は source_refs の出典を参照する。",
+  "properties": {
+    "code": {
+      "minLength": 1,
+      "title": "Code",
+      "type": "string"
+    },
+    "course": {
+      "minLength": 1,
+      "title": "Course",
+      "type": "string"
+    },
+    "objective_dimensions": {
+      "items": {
+        "$ref": "#/$defs/ObjectiveDimension"
+      },
+      "minItems": 1,
+      "title": "Objective Dimensions",
+      "type": "array"
+    },
+    "path": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Path",
+      "type": "array"
+    },
+    "prerequisites": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Prerequisites",
+      "type": "array"
+    },
+    "restrictions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Restrictions",
+      "type": "array"
+    },
+    "review": {
+      "$ref": "#/$defs/CurriculumReview"
+    },
+    "school_level": {
+      "minLength": 1,
+      "title": "School Level",
+      "type": "string"
+    },
+    "scope_notes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Scope Notes",
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "$ref": "#/$defs/CurriculumSourceRef"
+      },
+      "minItems": 1,
+      "title": "Source Refs",
+      "type": "array"
+    },
+    "source_version": {
+      "minLength": 1,
+      "title": "Source Version",
+      "type": "string"
+    },
+    "statement_ja": {
+      "minLength": 1,
+      "title": "Statement Ja",
+      "type": "string"
+    },
+    "subject": {
+      "minLength": 1,
+      "title": "Subject",
+      "type": "string"
+    },
+    "uncertainty_notes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Uncertainty Notes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "code",
+    "source_version",
+    "school_level",
+    "subject",
+    "course",
+    "path",
+    "statement_ja",
+    "objective_dimensions",
+    "source_refs"
+  ],
+  "title": "CurriculumRecord",
+  "type": "object"
+}

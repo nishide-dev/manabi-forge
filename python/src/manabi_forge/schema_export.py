@@ -18,6 +18,7 @@ from manabi_forge.models import (
     ReleaseManifest,
     ReviewRecord,
 )
+from manabi_forge.models.curriculum import CurriculumRecord
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
@@ -35,6 +36,7 @@ SCHEMA_EXPORTS: dict[str, type[BaseModel]] = {
     "review.schema.json": ReviewRecord,
     "provenance.schema.json": ProvenanceRecord,
     "release.schema.json": ReleaseManifest,
+    "curriculum.schema.json": CurriculumRecord,
 }
 
 
