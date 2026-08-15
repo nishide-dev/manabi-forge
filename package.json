@@ -1,0 +1,22 @@
+{
+  "name": "manabi-forge-root",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --dir web dev",
+    "lint:web": "pnpm --dir web lint",
+    "format:web": "pnpm --dir web format",
+    "typecheck:web": "pnpm --dir web typecheck",
+    "test:web": "pnpm --dir web test",
+    "build:web": "pnpm --dir web build",
+    "lint:py": "cd python && uv run ruff check --config ruff.toml src tests",
+    "format:py": "cd python && uv run ruff format --config ruff.toml src tests",
+    "format:py:check": "cd python && uv run ruff format --check --config ruff.toml src tests",
+    "typecheck:py": "cd python && uv run ty check",
+    "test:py": "cd python && uv run pytest"
+  },
+  "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=20"
+  }
+}

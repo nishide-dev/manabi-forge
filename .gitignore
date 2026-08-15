@@ -1,0 +1,52 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Node
+node_modules
+dist
+dist-ssr
+*.local
+*.tsbuildinfo
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Generated build artifacts (PDFs are release assets, not repository content)
+build/
+*.pdf
+
+# TeX intermediates
+*.aux
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc
+*.upa
+*.upb
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

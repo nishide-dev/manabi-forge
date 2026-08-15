@@ -1,0 +1,45 @@
+exclude = [
+  ".git",
+  ".pytest_cache",
+  ".ruff_cache",
+  ".venv",
+  "build",
+  "dist",
+  "node_modules",
+]
+line-length = 88
+indent-width = 4
+target-version = "py312"
+
+[lint]
+select = ["ALL"]
+ignore = [
+  "COM812", # conflicts with the formatter
+  "CPY001", # ライセンス表記はリポジトリルートの LICENSE-CODE で一元管理する
+  "D203",   # conflicts with D211
+  "D213",   # conflicts with D212
+  "E501",   # formatter owns physical line wrapping
+  "ISC001", # conflicts with the formatter
+]
+fixable = ["ALL"]
+unfixable = []
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[lint.per-file-ignores]
+"src/manabi_forge/cli/**/*.py" = [
+  "FBT001", # Typer のオプション定義は真偽値引数を必要とする
+  "FBT002", # 同上(デフォルト値付き真偽値引数)
+]
+"tests/**/*.py" = [
+  "ANN001",
+  "ANN201",
+  "D",
+  "INP001", # pytest のテストディレクトリは __init__.py を持たない
+  "S101",
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
