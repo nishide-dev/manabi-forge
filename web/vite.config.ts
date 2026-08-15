@@ -6,6 +6,9 @@ import { defineConfig } from "vite"
 
 // https://vite.dev/config/
 export default defineConfig({
+  // GitHub Pages のプロジェクトサイト(/manabi-forge/)配下に置くため、
+  // デプロイ時は BASE_PATH で上書きする。ローカルは "/"。
+  base: process.env.BASE_PATH ?? "/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
