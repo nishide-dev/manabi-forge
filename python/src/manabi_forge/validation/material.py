@@ -46,8 +46,10 @@ REQUIRED_FILES = ("material.yaml", "provenance.yaml", "ATTRIBUTION.md")
 
 #: プレースホルダー・禁止マーカー(spec §13.3)。禁止フレーズ(商用シリーズ名
 #: など)は権利レビュー導入時に追加する。
+#: 注意: CJK 文字は \w に含まれ日本語文中ではマーカー前後に \b が発生しない
+#: ため、\b ではなく ASCII 英数のみを除外する明示的な lookaround を使う。
 PLACEHOLDER_PATTERN = re.compile(
-    r"\b(TODO|FIXME|TBD|PLACEHOLDER|CHANGEME|lorem ipsum)\b",
+    r"(?<![0-9A-Za-z_])(TODO|FIXME|TBD|PLACEHOLDER|CHANGEME|lorem ipsum)(?![0-9A-Za-z_])",
     re.IGNORECASE,
 )
 
@@ -110,9 +112,11 @@ def _check_required_files(material_dir: Path) -> list[ValidationIssue]:
         if not (material_dir / name).is_file()
     ]
     source_dir = material_dir / "source"
-    if not source_dir.is_dir() or not any(source_dir.iterdir()):
+    if not source_dir.is_dir() or not any(
+        path.is_file() for path in source_dir.rglob("*")
+    ):
         issues.append(
-            _error("missing-source", "source/", "source/ が存在しないか空である"),
+            _error("missing-source", "source/", "source/ にファイルが存在しない"),
         )
     return issues
 
@@ -143,18 +147,22 @@ def _check_path_consistency(
     material_dir: Path,
     manifest: MaterialManifest,
 ) -> list[ValidationIssue]:
-    """Check ID/directory agreement and the standard materials layout."""
+    """Check ID/directory agreement and the standard materials layout.
+
+    ID チェックとレイアウトチェックは同じ解決済みパスを基準にする
+    (シンボリックリンク経由で両者の基準がずれることを防ぐ)。
+    """
     issues: list[ValidationIssue] = []
-    if material_dir.name != manifest.id:
+    resolved = material_dir.resolve()
+    if resolved.name != manifest.id:
         issues.append(
             _error(
                 "id-path-mismatch",
                 "material.yaml:id",
-                f"ディレクトリ名 {material_dir.name!r} と id {manifest.id!r} が一致しない",
+                f"ディレクトリ名 {resolved.name!r} と id {manifest.id!r} が一致しない",
             ),
         )
 
-    resolved = material_dir.resolve()
     ancestors = list(resolved.parents)
     if (
         len(ancestors) >= _MATERIALS_ANCESTOR_DEPTH
@@ -197,17 +205,23 @@ def _check_path_consistency(
 
 
 def _check_format_id_token(manifest: MaterialManifest) -> list[ValidationIssue]:
-    """Check that the ID contains the segment token matching the format."""
+    """Check the format segment of the ID (spec §11.2).
+
+    format は ``<course>-<unit>-<format>-<serial>`` の連番直前に位置するため、
+    末尾から 2 番目のセグメントを照合する(任意位置の一致では別スロットの
+    トークンで擦り抜けられる)。
+    """
     token = FORMAT_ID_TOKENS[manifest.classification.format]
     segments = manifest.id.split("-")
-    if token not in segments:
+    format_segment = segments[-2] if len(segments) >= 2 else ""  # noqa: PLR2004
+    if format_segment != token:
         return [
             _error(
                 "format-id-mismatch",
                 "material.yaml:classification.format",
-                f"id {manifest.id!r} に format "
-                f"{manifest.classification.format.value!r} に対応するセグメント "
-                f"{token!r} が含まれていない",
+                f"id {manifest.id!r} の format セグメント {format_segment!r} が "
+                f"format {manifest.classification.format.value!r} に対応する "
+                f"{token!r} と一致しない",
             ),
         ]
     return []

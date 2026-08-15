@@ -47,16 +47,31 @@ class ValidateReport(BaseModel):
 
 
 def discover_material_dirs(root: Path) -> list[Path]:
-    """Find every material directory (containing material.yaml) under ``root``."""
+    """Find every material root directory (containing material.yaml) under ``root``.
+
+    教材ディレクトリ内(source/ など)に紛れ込んだ material.yaml を独立教材と
+    誤認しないよう、既に発見した教材ルートの配下は除外する。
+    """
     if not root.is_dir():
         return []
-    return sorted(path.parent for path in root.rglob("material.yaml"))
+    candidates = sorted(path.parent for path in root.rglob("material.yaml"))
+    roots: list[Path] = []
+    for candidate in candidates:  # sorted なので親が先に現れる
+        if not any(candidate.is_relative_to(found) for found in roots):
+            roots.append(candidate)
+    return roots
 
 
 def _resolve_targets(paths: list[Path]) -> list[Path]:
     if paths:
         return paths
-    return discover_material_dirs(find_repo_root() / "materials")
+    materials_root = find_repo_root() / "materials"
+    if not materials_root.is_dir():
+        # 既定走査対象が丸ごと欠けているのは検証失敗ではなく構成エラー
+        # (spec §16.2: usage/configuration error = 2)
+        msg = f"materials root not found: {materials_root}"
+        raise typer.BadParameter(msg)
+    return discover_material_dirs(materials_root)
 
 
 @app.command()
@@ -89,14 +104,23 @@ def validate(
     elif not report.materials:
         typer.echo("no materials found")
     else:
+        errors = warnings = 0
         for material in report.materials:
-            status = "ok" if not material.issues else "issues"
+            material_errors = [
+                issue for issue in material.issues if issue.level is IssueLevel.ERROR
+            ]
+            errors += len(material_errors)
+            warnings += len(material.issues) - len(material_errors)
+            status = "ok" if not material_errors else "errors"
             typer.echo(f"{material.path}: {status}")
             for issue in material.issues:
                 typer.echo(
                     f"  [{issue.level.value}] {issue.code} ({issue.location}): "
                     f"{issue.message}",
                 )
+        typer.echo(
+            f"{len(report.materials)} materials, {errors} errors, {warnings} warnings",
+        )
 
     if report.has_errors:
         raise typer.Exit(EXIT_VALIDATION_FAILURE)

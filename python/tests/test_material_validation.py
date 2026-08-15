@@ -17,6 +17,8 @@ runner = CliRunner()
 
 MATERIAL_ID = "math1-qf-guided-0001"
 
+EXIT_USAGE_ERROR = 2  # spec §16.2: usage/configuration error
+
 
 def make_manifest_data() -> dict:
     return {
@@ -177,6 +179,59 @@ class TestValidateMaterialDir:
         )
         assert "placeholder-marker" in errors_of(validate_material_dir(material_dir))
 
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "解答はTODOです",  # CJK 文字に挟まれたマーカー(\b では検出不能)
+            "この問題のFIXMEを直す",
+            "値はTBDとする",
+            "ここにPLACEHOLDERを置く",
+        ],
+    )
+    def test_placeholder_detected_inside_japanese_text(self, material_dir, text):
+        (material_dir / "source" / "main.tex").write_text(
+            f"\\begin{{document}}{text}\\end{{document}}\n",
+            encoding="utf-8",
+        )
+        assert "placeholder-marker" in errors_of(validate_material_dir(material_dir))
+
+    def test_placeholder_not_matched_inside_identifiers(self, material_dir):
+        (material_dir / "source" / "main.tex").write_text(
+            "\\begin{document}todo_list や mastodon は誤検出しない\\end{document}\n",
+            encoding="utf-8",
+        )
+        assert "placeholder-marker" not in errors_of(
+            validate_material_dir(material_dir),
+        )
+
+    def test_source_with_only_empty_subdir_is_missing(self, material_dir):
+        (material_dir / "source" / "main.tex").unlink()
+        (material_dir / "source" / "sub").mkdir()
+        assert "missing-source" in errors_of(validate_material_dir(material_dir))
+
+    def test_symlinked_material_dir_uses_resolved_path(self, tmp_path, material_dir):
+        link = tmp_path / "link-to-material"
+        link.symlink_to(material_dir, target_is_directory=True)
+        issues = validate_material_dir(link)
+        # 解決先は標準レイアウト内にあるため、警告なくエラーなしで検証される
+        assert errors_of(issues) == set()
+        assert not any(issue.code == "nonstandard-path" for issue in issues)
+
+    def test_format_token_in_wrong_segment_is_rejected(self, material_dir):
+        # course スロットに guided が入っていても format セグメントは common
+        data = make_manifest_data()
+        data["id"] = "guided-qf-common-0001"
+        write_manifest(material_dir, data)
+        renamed = material_dir.parent / "guided-qf-common-0001"
+        material_dir.rename(renamed)
+        prov = make_provenance_data()
+        prov["material_id"] = "guided-qf-common-0001"
+        (renamed / "provenance.yaml").write_text(
+            yaml.safe_dump(prov, allow_unicode=True),
+            encoding="utf-8",
+        )
+        assert "format-id-mismatch" in errors_of(validate_material_dir(renamed))
+
     def test_ai_common_test_requires_item_spec(self, material_dir):
         data = make_manifest_data()
         data["id"] = "math1-qf-common-0001"
@@ -245,7 +300,48 @@ class TestMaterialCli:
         payload = json.loads(result.output)
         assert payload["materials"][0]["issues"] == []
 
+    def test_validate_json_output_reports_failure(self, material_dir):
+        (material_dir / "ATTRIBUTION.md").unlink()
+        result = runner.invoke(
+            app,
+            ["material", "validate", "--json", str(material_dir)],
+        )
+        assert result.exit_code == EXIT_VALIDATION_FAILURE
+        payload = json.loads(result.output)
+        codes = {issue["code"] for issue in payload["materials"][0]["issues"]}
+        assert "missing-required-file" in codes
+
+    def test_validate_multiple_targets_aggregates_errors(self, material_dir, tmp_path):
+        broken = tmp_path / "broken" / MATERIAL_ID
+        shutil.copytree(material_dir, broken)
+        (broken / "ATTRIBUTION.md").unlink()
+        result = runner.invoke(
+            app,
+            ["material", "validate", str(material_dir), str(broken)],
+        )
+        assert result.exit_code == EXIT_VALIDATION_FAILURE
+        assert "1 errors" in result.output
+
     def test_discover_material_dirs(self, material_dir, tmp_path):
+        found = discover_material_dirs(tmp_path / "materials")
+        assert found == [material_dir]
+
+    def test_missing_materials_root_is_usage_error(self, monkeypatch, tmp_path):
+        # 既定走査対象が存在しない場合は検証成功(0)ではなく構成エラー(2)
+        monkeypatch.setattr(
+            "manabi_forge.cli.material.find_repo_root",
+            lambda: tmp_path / "elsewhere",
+        )
+        result = runner.invoke(app, ["material", "validate"])
+        assert result.exit_code == EXIT_USAGE_ERROR
+        assert "materials root not found" in result.output
+
+    def test_discover_skips_nested_material_yaml(self, material_dir, tmp_path):
+        # 教材の source/ 配下の material.yaml(フィクスチャ等)は独立教材ではない
+        (material_dir / "source" / "material.yaml").write_text(
+            "id: fixture\n",
+            encoding="utf-8",
+        )
         found = discover_material_dirs(tmp_path / "materials")
         assert found == [material_dir]
 
