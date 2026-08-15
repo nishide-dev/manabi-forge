@@ -13,6 +13,7 @@ import typer
 from manabi_forge import __version__
 from manabi_forge.cli.material import app as material_app
 from manabi_forge.cli.schemas import app as schemas_app
+from manabi_forge.cli.tex import app as tex_app
 from manabi_forge.doctor import run_checks
 
 if TYPE_CHECKING:
@@ -29,6 +30,7 @@ app = typer.Typer(
 )
 app.add_typer(material_app)
 app.add_typer(schemas_app)
+app.add_typer(tex_app)
 
 
 @app.command()
