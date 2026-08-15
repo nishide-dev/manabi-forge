@@ -1,0 +1,18 @@
+created_at: '2026-08-15T21:33:09Z'
+findings:
+- code: independent-derivation
+  location: source/main.tex
+  message: '独立に再導出: y=x^2-4x+5=(x-2)^2+1、[0,3] で最小 1 (x=2)・最大 5 (x=0)。練習: y=-x^2+2x+2=-(x-1)^2+3、[0,3]
+    で最大 3 (x=1)・最小 -1 (x=3)。PR #8 / #16 のレビューエージェントによる数値検算とも一致。'
+  severity: note
+  suggested_action: ''
+material_id: math1-qf-guided-0001
+result: passed
+review_id: mathematics-agent-20260815-0001
+review_type: mathematics
+reviewed_commit: da105e3e59fd5a5ecd37b043e7f8c4be518ae9f7
+reviewer:
+  kind: automated
+  name: claude-fable-5
+  tool_version: claude-fable-5 (Claude Code agent review)
+schema_version: '1.0'

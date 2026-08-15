@@ -1,0 +1,17 @@
+created_at: '2026-08-15T21:33:09Z'
+findings:
+- code: originality
+  location: provenance.yaml
+  message: フェンスと花壇の文章題は独自作成で、過去問題・公式サンプル問題の複製・言い換えを含まない。第三者素材なし。追加免責を全ページに表示。
+  severity: note
+  suggested_action: ''
+material_id: math1-qf-common-0001
+result: passed
+review_id: rights-agent-20260815-0001
+review_type: rights
+reviewed_commit: da105e3e59fd5a5ecd37b043e7f8c4be518ae9f7
+reviewer:
+  kind: automated
+  name: claude-fable-5
+  tool_version: claude-fable-5 (Claude Code agent review)
+schema_version: '1.0'

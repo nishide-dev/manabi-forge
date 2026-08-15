@@ -1,0 +1,17 @@
+created_at: '2026-08-15T21:33:09Z'
+findings:
+- code: provisional-codes
+  location: material.yaml:curriculum.codes
+  message: 84V10-math-i-quadratic-functions / 84V10-math-i-qf-max-min に解決(暫定 ID)。文章題の解法は平方完成と端点比較のみで、範囲外の知識を要求しない。
+  severity: note
+  suggested_action: ''
+material_id: math1-qf-common-0001
+result: passed
+review_id: curriculum-agent-20260815-0001
+review_type: curriculum
+reviewed_commit: da105e3e59fd5a5ecd37b043e7f8c4be518ae9f7
+reviewer:
+  kind: automated
+  name: claude-fable-5
+  tool_version: claude-fable-5 (Claude Code agent review)
+schema_version: '1.0'

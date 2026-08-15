@@ -1,0 +1,17 @@
+created_at: '2026-08-15T21:33:09Z'
+findings:
+- code: wording-check
+  location: source/main.tex
+  message: 指示文は一義的、記法一貫、段階解説(概念→例題→方針→解答→別解・注意→練習)の構成が機能している。式と定義域括弧の間隔を視覚レビューで調整済み。
+  severity: note
+  suggested_action: ''
+material_id: math1-qf-guided-0001
+result: passed
+review_id: editorial-agent-20260815-0001
+review_type: editorial
+reviewed_commit: da105e3e59fd5a5ecd37b043e7f8c4be518ae9f7
+reviewer:
+  kind: automated
+  name: claude-fable-5
+  tool_version: claude-fable-5 (Claude Code agent review)
+schema_version: '1.0'
