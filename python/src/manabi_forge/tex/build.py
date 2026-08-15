@@ -112,6 +112,10 @@ def build_material(
     main_tex = material_dir / "source" / "main.tex"
     command = [
         latexmk,
+        # LuaLaTeX モードを明示的に選択する。新しい latexmk(TeX Live 2023+)では
+        # `-lualatex=CMD` は変数設定のみでエンジン選択を行わず、plain latex で
+        # 走ってしまうため、-pdflua を併用する
+        "-pdflua",
         # shell escape は明示的に無効化する(spec §15.4)
         "-lualatex=lualatex --no-shell-escape %O %S",
         "-halt-on-error",

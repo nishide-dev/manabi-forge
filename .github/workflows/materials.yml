@@ -1,0 +1,60 @@
+# ピン留めした TeX Live コンテナで全教材を実ビルドする(spec §9.5, §19.1)。
+# 教材・テンプレート・Python コアに変更があるときのみ実行する。
+name: Material Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "materials/**"
+      - "templates/**"
+      - "python/**"
+      - ".github/workflows/materials.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "materials/**"
+      - "templates/**"
+      - "python/**"
+      - ".github/workflows/materials.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-materials:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      # texlive/texlive:latest を digest でピン留め(spec §9.5 の再現性要件)。
+      # 更新は digest の差し替え PR として明示的にレビューする。
+      image: texlive/texlive@sha256:1cb66a6dc31fe153369c5bb63549aea31c2ffb351613af67b182d84c8521fe89
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+
+      - name: Sync Python dependencies (locked)
+        working-directory: python
+        run: uv sync --locked --all-groups
+
+      - name: Build every committed material
+        working-directory: python
+        run: |
+          set -eu
+          found=0
+          for manifest in $(find ../materials -mindepth 5 -maxdepth 5 -name material.yaml | sort); do
+            dir="$(dirname "$manifest")"
+            echo "::group::${dir}"
+            uv run manabi tex build "$dir"
+            echo "::endgroup::"
+            found=1
+          done
+          if [ "$found" = "0" ]; then
+            echo "no materials found under materials/" >&2
+            exit 2
+          fi
