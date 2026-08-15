@@ -88,6 +88,10 @@ jobs:
         # コミット済み schemas/ がモデルから再生成した内容と一致すること(spec §9.3)
         run: uv run manabi schemas check
 
+      - name: Material structural validation
+        # コミット済みの全教材が構造的に妥当であること(spec §13.3 Stage C)
+        run: uv run manabi material validate
+
       - name: CLI smoke test
         run: |
           uv run manabi version
