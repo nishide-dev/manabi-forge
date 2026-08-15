@@ -58,8 +58,9 @@ class TestMaterialManifest:
         [
             "Math1-qf-common-0001",  # 大文字
             "math1_qf_common_0001",  # アンダースコア
-            "math1-qf-0001",  # セグメント不足
             "math1-qf-common-1",  # 連番が 4 桁でない
+            "math1-qf-common-0001-",  # 末尾ハイフン
+            "0001",  # 連番のみ
         ],
     )
     def test_rejects_malformed_id(self, bad_id):
@@ -81,6 +82,26 @@ class TestMaterialManifest:
         assert manifest.validation.schema_check.value == "passed"
         dumped = manifest.model_dump(by_alias=True)
         assert dumped["validation"]["schema"] == "passed"
+
+    def test_default_dump_round_trips(self):
+        # model_dump() の既定出力をそのまま再読込できること(alias 起因の
+        # write-only フィールドが存在しないことの回帰テスト)。
+        manifest = MaterialManifest.model_validate(make_material_data())
+        reloaded = MaterialManifest.model_validate(manifest.model_dump(mode="json"))
+        assert reloaded == manifest
+
+    @pytest.mark.parametrize(
+        "good_id",
+        [
+            "math1-quadratic-functions-common-test-style-0001",  # 複数語セグメント
+            "math1-qf-guided-0001",
+            "info1-network-basics-worksheet-0203",
+        ],
+    )
+    def test_accepts_multi_word_id_segments(self, good_id):
+        data = make_material_data()
+        data["id"] = good_id
+        assert MaterialManifest.model_validate(data).id == good_id
 
 
 def make_item_data() -> dict:
@@ -136,6 +157,23 @@ class TestItemSpec:
         data["parts"] = [data["parts"][0], part]
         with pytest.raises(ValidationError, match="duplicate part ids"):
             ItemSpec.model_validate(data)
+
+    def test_rejects_duplicate_choice_labels(self):
+        data = make_item_data()
+        data["parts"][0]["choices"][0]["label"] = "2"
+        data["parts"][0]["choices"][1]["is_correct"] = True
+        with pytest.raises(ValidationError, match="labels must be unique"):
+            ItemSpec.model_validate(data)
+
+    def test_rejects_correct_answer_not_matching_correct_choice(self):
+        data = make_item_data()
+        data["parts"][0]["correct_answer"] = "99"
+        with pytest.raises(ValidationError, match="does not match the correct choice"):
+            ItemSpec.model_validate(data)
+
+    def test_round_trips_default_dump(self):
+        item = ItemSpec.model_validate(make_item_data())
+        assert ItemSpec.model_validate(item.model_dump(mode="json")) == item
 
 
 def make_review_data() -> dict:
@@ -194,53 +232,104 @@ class TestProvenanceRecord:
                     {
                         "description": "draft item from brief",
                         "model": "claude-fable-5",
-                        "prompt_hash": "abc123",
+                        "prompt_hash": "a" * 64,
                     },
                 ],
             },
         )
         assert record.ai_steps[0].model == "claude-fable-5"
 
+    def test_rejects_non_sha256_prompt_hash(self):
+        with pytest.raises(ValidationError):
+            ProvenanceRecord.model_validate(
+                {
+                    "material_id": "math1-qf-common-0001",
+                    "authors": ["nishide-dev"],
+                    "ai_steps": [
+                        {"description": "draft", "prompt_hash": "not-a-hash"},
+                    ],
+                },
+            )
+
+    def test_rejects_prompt_summary_long_enough_to_be_a_raw_prompt(self):
+        # 500 文字超の「要約」はプロンプト原文の混入とみなして拒否(spec §11.6)
+        with pytest.raises(ValidationError):
+            ProvenanceRecord.model_validate(
+                {
+                    "material_id": "math1-qf-common-0001",
+                    "authors": ["nishide-dev"],
+                    "ai_steps": [
+                        {"description": "draft", "prompt_summary": "x" * 501},
+                    ],
+                },
+            )
+
+
+ALL_REVIEWS_PASSED = {
+    "mathematics": "passed",
+    "curriculum": "passed",
+    "editorial": "passed",
+    "visual": "passed",
+    "rights": "passed",
+}
+
+
+def make_release_data() -> dict:
+    """Return a valid Appendix B style release manifest payload."""
+    return {
+        "materialId": "math1-qf-common-0001",
+        "materialVersion": "1.0.0",
+        "sourceCommit": "0123456789abcdef",
+        "curriculumSnapshot": "mext-84V10-2026-08",
+        "template": {"id": "common-test", "version": "1.0.0"},
+        "reviews": dict(ALL_REVIEWS_PASSED),
+        "artifacts": [
+            {
+                "kind": "problem-pdf",
+                "filename": "math1-qf-common-0001-v1.0.0-problem.pdf",
+                "sha256": "a" * 64,
+            },
+        ],
+    }
+
 
 class TestReleaseManifest:
     def test_serializes_camel_case_like_appendix_b(self):
-        manifest = ReleaseManifest.model_validate(
-            {
-                "materialId": "math1-qf-common-0001",
-                "materialVersion": "1.0.0",
-                "sourceCommit": "0123456789abcdef",
-                "curriculumSnapshot": "mext-84V10-2026-08",
-                "template": {"id": "common-test", "version": "1.0.0"},
-                "reviews": {"mathematics": "passed"},
-                "artifacts": [
-                    {
-                        "kind": "problem-pdf",
-                        "filename": "math1-qf-common-0001-v1.0.0-problem.pdf",
-                        "sha256": "a" * 64,
-                    },
-                ],
-            },
-        )
+        manifest = ReleaseManifest.model_validate(make_release_data())
         dumped = manifest.model_dump(by_alias=True)
         assert dumped["materialId"] == "math1-qf-common-0001"
         assert dumped["curriculumSnapshot"] == "mext-84V10-2026-08"
 
     def test_accepts_snake_case_input_too(self):
-        manifest = ReleaseManifest.model_validate(
-            {
-                "material_id": "math1-qf-common-0001",
-                "material_version": "1.0.0",
-                "source_commit": "0123456789abcdef",
-                "curriculum_snapshot": "mext-84V10-2026-08",
-                "template": {"id": "common-test", "version": "1.0.0"},
-                "reviews": {},
-                "artifacts": [
-                    {
-                        "kind": "problem-pdf",
-                        "filename": "p.pdf",
-                        "sha256": "b" * 64,
-                    },
-                ],
-            },
-        )
+        data = make_release_data()
+        data["material_id"] = data.pop("materialId")
+        data["material_version"] = data.pop("materialVersion")
+        data["source_commit"] = data.pop("sourceCommit")
+        data["curriculum_snapshot"] = data.pop("curriculumSnapshot")
+        manifest = ReleaseManifest.model_validate(data)
         assert manifest.material_version == "1.0.0"
+
+    def test_rejects_missing_required_review(self):
+        # 必須レビューの欠落は人間公開ゲート(ADR-004)の迂回になるため拒否
+        data = make_release_data()
+        del data["reviews"]["rights"]
+        with pytest.raises(ValidationError, match="missing required reviews"):
+            ReleaseManifest.model_validate(data)
+
+    def test_rejects_empty_reviews(self):
+        data = make_release_data()
+        data["reviews"] = {}
+        with pytest.raises(ValidationError, match="missing required reviews"):
+            ReleaseManifest.model_validate(data)
+
+    def test_rejects_non_passed_review(self):
+        data = make_release_data()
+        data["reviews"]["mathematics"] = "failed"
+        with pytest.raises(ValidationError, match="non-passed reviews"):
+            ReleaseManifest.model_validate(data)
+
+    def test_rejects_unknown_review_type(self):
+        data = make_release_data()
+        data["reviews"]["totally-made-up"] = "passed"
+        with pytest.raises(ValidationError):
+            ReleaseManifest.model_validate(data)

@@ -5,20 +5,29 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated
 
-from manabi_forge.models.common import CheckStatus, MaterialId, NonEmptyStr
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+
+from manabi_forge.models.common import CheckStatus, MaterialId, NonEmptyStr, Sha256
+
+PromptSummary = Annotated[str, StringConstraints(max_length=500)]
+"""プロンプトの要約。長大な文字列はプロンプト原文の混入とみなして拒否する。"""
 
 
 class AiStep(BaseModel):
-    """One AI-assisted step. プロンプトはハッシュまたは要約のみ(spec §11.6)."""
+    """One AI-assisted step.
+
+    プロンプト原文や資格情報は保存しない(spec §11.6)。ハッシュは SHA-256、
+    要約は 500 文字以内に制約し、原文の丸ごと貼り付けを型レベルで防ぐ。
+    """
 
     model_config = ConfigDict(extra="forbid")
 
     description: NonEmptyStr
     model: str = ""
-    prompt_hash: str = ""
-    prompt_summary: str = ""
+    prompt_hash: Sha256 | None = None
+    prompt_summary: PromptSummary = ""
 
 
 class SourceRef(BaseModel):

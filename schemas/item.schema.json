@@ -132,6 +132,7 @@
       "type": "object"
     }
   },
+  "$id": "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/item.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Semantic structure of one problem (``item.yaml``, spec §11.4).",
@@ -145,7 +146,7 @@
       "type": "string"
     },
     "material_id": {
-      "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\\d{4}$",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-\\d{4}$",
       "title": "Material Id",
       "type": "string"
     },

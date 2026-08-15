@@ -17,11 +17,12 @@ from manabi_forge.schema_export import (
 
 
 def test_render_schema_is_deterministic_json():
-    first = render_schema(MaterialManifest)
-    second = render_schema(MaterialManifest)
+    first = render_schema(MaterialManifest, "material.schema.json")
+    second = render_schema(MaterialManifest, "material.schema.json")
     assert first == second
     parsed = json.loads(first)
     assert parsed["$schema"] == JSON_SCHEMA_DIALECT
+    assert parsed["$id"].endswith("/schemas/material.schema.json")
 
 
 def test_write_then_check_round_trip(tmp_path):

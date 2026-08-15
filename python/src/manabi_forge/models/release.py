@@ -5,7 +5,7 @@ Appendix B の例に合わせて JSON 表現は camelCase を用いる(YAML 正�
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic.alias_generators import to_camel
 
 from manabi_forge.models.common import (
@@ -13,6 +13,7 @@ from manabi_forge.models.common import (
     GitSha,
     MaterialId,
     NonEmptyStr,
+    ReviewType,
     SemVer,
     Sha256,
 )
@@ -53,7 +54,29 @@ class ReleaseManifest(BaseModel):
     source_commit: GitSha
     curriculum_snapshot: NonEmptyStr
     template: TemplateRef
-    reviews: dict[str, CheckStatus] = Field(
+    reviews: dict[ReviewType, CheckStatus] = Field(
         description="レビュー種別ごとの結果。公開には全必須レビューの passed が必要。",
     )
     artifacts: list[ReleaseArtifact] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _all_required_reviews_passed(self) -> ReleaseManifest:
+        """Require every review type to be present and passed.
+
+        リリースマニフェストは公開時にのみ生成される成果物であり、必須レビューの
+        欠落・不合格を許すと人間公開ゲート(ADR-004、spec §13.9)を迂回できて
+        しまうため、モデルレベルで拒否する。
+        """
+        missing = [kind.value for kind in ReviewType if kind not in self.reviews]
+        if missing:
+            msg = f"release manifest is missing required reviews: {missing}"
+            raise ValueError(msg)
+        not_passed = [
+            kind.value
+            for kind, status in self.reviews.items()
+            if status is not CheckStatus.PASSED
+        ]
+        if not_passed:
+            msg = f"release manifest has non-passed reviews: {not_passed}"
+            raise ValueError(msg)
+        return self

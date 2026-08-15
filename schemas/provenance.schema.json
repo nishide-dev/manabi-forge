@@ -2,7 +2,7 @@
   "$defs": {
     "AiStep": {
       "additionalProperties": false,
-      "description": "One AI-assisted step. プロンプトはハッシュまたは要約のみ(spec §11.6).",
+      "description": "One AI-assisted step.\n\nプロンプト原文や資格情報は保存しない(spec §11.6)。ハッシュは SHA-256、\n要約は 500 文字以内に制約し、原文の丸ごと貼り付けを型レベルで防ぐ。",
       "properties": {
         "description": {
           "minLength": 1,
@@ -15,12 +15,21 @@
           "type": "string"
         },
         "prompt_hash": {
-          "default": "",
-          "title": "Prompt Hash",
-          "type": "string"
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prompt Hash"
         },
         "prompt_summary": {
           "default": "",
+          "maxLength": 500,
           "title": "Prompt Summary",
           "type": "string"
         }
@@ -69,6 +78,7 @@
       "type": "object"
     }
   },
+  "$id": "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/provenance.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Full provenance of a material (``provenance.yaml``, spec §11.6).",
@@ -99,7 +109,7 @@
       "type": "array"
     },
     "material_id": {
-      "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\\d{4}$",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-\\d{4}$",
       "title": "Material Id",
       "type": "string"
     },

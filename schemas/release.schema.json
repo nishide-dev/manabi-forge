@@ -38,6 +38,18 @@
       "title": "ReleaseArtifact",
       "type": "object"
     },
+    "ReviewType": {
+      "description": "Review specialties recorded as separate review records (spec §13).",
+      "enum": [
+        "mathematics",
+        "curriculum",
+        "editorial",
+        "visual",
+        "rights"
+      ],
+      "title": "ReviewType",
+      "type": "string"
+    },
     "TemplateRef": {
       "additionalProperties": false,
       "description": "Template identity and version recorded in every artifact (spec §15.3).",
@@ -61,6 +73,7 @@
       "type": "object"
     }
   },
+  "$id": "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/release.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Manifest describing one immutable material release (spec §18, Appendix B).",
@@ -79,7 +92,7 @@
       "type": "string"
     },
     "materialId": {
-      "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\\d{4}$",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-\\d{4}$",
       "title": "Materialid",
       "type": "string"
     },
@@ -93,6 +106,9 @@
         "$ref": "#/$defs/CheckStatus"
       },
       "description": "レビュー種別ごとの結果。公開には全必須レビューの passed が必要。",
+      "propertyNames": {
+        "$ref": "#/$defs/ReviewType"
+      },
       "title": "Reviews",
       "type": "object"
     },

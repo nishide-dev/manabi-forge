@@ -24,6 +24,11 @@ if TYPE_CHECKING:
 
 JSON_SCHEMA_DIALECT = "https://json-schema.org/draft/2020-12/schema"
 
+SCHEMA_ID_BASE = (
+    "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/"
+)
+"""各スキーマの安定 ``$id``。外部バリデータと相互参照の解決アンカーになる。"""
+
 SCHEMA_EXPORTS: dict[str, type[BaseModel]] = {
     "material.schema.json": MaterialManifest,
     "item.schema.json": ItemSpec,
@@ -47,10 +52,11 @@ def find_repo_root(start: Path | None = None) -> Path:
     raise RepoRootNotFoundError(msg)
 
 
-def render_schema(model: type[BaseModel]) -> str:
+def render_schema(model: type[BaseModel], filename: str) -> str:
     """Render one model's JSON Schema as deterministic, committed-file text."""
     schema = model.model_json_schema()
     schema["$schema"] = JSON_SCHEMA_DIALECT
+    schema["$id"] = SCHEMA_ID_BASE + filename
     return json.dumps(schema, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
 
 
@@ -60,7 +66,7 @@ def write_schemas(out_dir: Path) -> list[Path]:
     written: list[Path] = []
     for filename, model in SCHEMA_EXPORTS.items():
         path = out_dir / filename
-        path.write_text(render_schema(model), encoding="utf-8")
+        path.write_text(render_schema(model, filename), encoding="utf-8")
         written.append(path)
     return written
 
@@ -71,7 +77,7 @@ def check_schemas(out_dir: Path) -> list[str]:
     for filename, model in SCHEMA_EXPORTS.items():
         path = out_dir / filename
         if not path.is_file() or path.read_text(encoding="utf-8") != render_schema(
-            model
+            model, filename
         ):
             stale.append(filename)
     return stale

@@ -66,15 +66,30 @@ class ItemPart(BaseModel):
 
     @model_validator(mode="after")
     def _choices_match_answer_type(self) -> ItemPart:
-        """Multiple-choice parts need choices with exactly one correct choice."""
+        """Enforce choice consistency for multiple-choice parts.
+
+        選択肢ラベルの重複と、``correct_answer`` と ``is_correct`` の
+        二重表現の食い違い(spec §11.5 の non-unique-answer 系欠陥)を拒否する。
+        """
         if self.answer_type is AnswerType.MULTIPLE_CHOICE:
             if len(self.choices) < 2:  # noqa: PLR2004 -- 選択式は最低 2 択
                 msg = f"part {self.id}: multiple-choice requires at least 2 choices"
                 raise ValueError(msg)
-            correct = sum(1 for choice in self.choices if choice.is_correct)
-            if correct != 1:
+            labels = [choice.label for choice in self.choices]
+            if len(labels) != len(set(labels)):
+                msg = f"part {self.id}: choice labels must be unique"
+                raise ValueError(msg)
+            correct_labels = [c.label for c in self.choices if c.is_correct]
+            if len(correct_labels) != 1:
                 msg = (
-                    f"part {self.id}: expected exactly 1 correct choice, got {correct}"
+                    f"part {self.id}: expected exactly 1 correct choice, "
+                    f"got {len(correct_labels)}"
+                )
+                raise ValueError(msg)
+            if self.correct_answer != correct_labels[0]:
+                msg = (
+                    f"part {self.id}: correct_answer {self.correct_answer!r} does not "
+                    f"match the correct choice label {correct_labels[0]!r}"
                 )
                 raise ValueError(msg)
         elif self.choices:

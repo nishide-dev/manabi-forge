@@ -55,7 +55,13 @@ class Artifacts(BaseModel):
 class ValidationState(BaseModel):
     """Per-dimension validation and review state (spec §11.3, §13)."""
 
-    model_config = ConfigDict(extra="forbid")
+    # ``schema`` エイリアスで入出力を統一し、model_dump() の既定出力を
+    # そのまま再読込できるようにする(round-trip 保証)。
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        serialize_by_alias=True,
+    )
 
     schema_check: CheckStatus = Field(default=CheckStatus.PENDING, alias="schema")
     tex: CheckStatus = CheckStatus.PENDING

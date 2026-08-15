@@ -7,8 +7,14 @@ from typing import Annotated
 
 from pydantic import StringConstraints
 
-MATERIAL_ID_PATTERN = r"^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\d{4}$"
-"""教材 ID 形式 ``<course>-<unit>-<format>-<serial>``(spec §11.2)。"""
+MATERIAL_ID_PATTERN = r"^[a-z0-9]+(-[a-z0-9]+)*-\d{4}$"
+"""教材 ID 形式 ``<course>-<unit>-<format>-<serial>``(spec §11.2)。
+
+course / unit / format の各セグメントは複数語(ハイフン区切り)でもよいため、
+パターンは「小文字英数セグメント列 + 4 桁連番」のみを保証する。セグメントの
+意味的な整合(例: format と classification.format の一致)はディレクトリ構造を
+参照できる教材バリデーション(issue #2)で検査する。
+"""
 
 SEMVER_PATTERN = r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$"
 

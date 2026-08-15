@@ -106,6 +106,7 @@
       "type": "string"
     }
   },
+  "$id": "https://raw.githubusercontent.com/nishide-dev/manabi-forge/main/schemas/review.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "One immutable review of a material at a specific commit (spec §11.5).\n\n正式レビュー中に教材を書き換えてはならない。指摘はこのレコードとして残す。",
@@ -123,7 +124,7 @@
       "type": "array"
     },
     "material_id": {
-      "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\\d{4}$",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-\\d{4}$",
       "title": "Material Id",
       "type": "string"
     },
