@@ -1,0 +1,62 @@
+schema_version: "1.0"
+material_id: math1-qf-common-0001
+
+stem: >-
+  長さ 20 m のフェンスをちょうど使い切って長方形の花壇を作る。
+  4 辺すべてをフェンスで囲むとき、隣り合う 2 辺は x m と (10 - x) m で
+  あり、花壇の面積を y m^2 とする。
+
+parts:
+  - id: "1"
+    prompt: y を x の式で表し、x のとり得る値の範囲を求める。
+    answer_type: expression
+    correct_answer: "y = -x^2 + 10x, 0 < x < 10"
+  - id: "2"
+    prompt: y の最大値と、そのときの x を求める。
+    answer_type: numeric
+    correct_answer: "x = 5 のとき最大値 25"
+  - id: "3"
+    prompt: 2 <= x <= 4 に制限したときの y の最大値と、そのときの x を求める。
+    answer_type: numeric
+    correct_answer: "x = 4 のとき最大値 24"
+  - id: "4"
+    prompt: 2 <= x <= 4 において y が最小となる x の値を選ぶ。
+    answer_type: multiple-choice
+    correct_answer: "1"
+    choices:
+      - label: "1"
+        text: x = 2
+        is_correct: true
+      - label: "2"
+        text: x = 3
+        rationale: 区間の中央で最小になるという誤解。上に凸の場合は頂点から最も遠い端点で最小となる。
+      - label: "3"
+        text: x = 4
+        rationale: 最大と最小の位置の取り違え。x = 4 は頂点に近い側の端点で最大を与える。
+      - label: "4"
+        text: 最小となる x の値はない
+        rationale: 閉区間では端点で最小値をとることの見落とし。開区間との混同。
+
+required_knowledge:
+  - 平方完成
+  - 定義域が制限された二次関数の最大・最小
+  - 頂点が定義域に含まれない場合の端点比較
+
+intended_reasoning: >-
+  文章から面積を二次関数として立式し、平方完成で頂点を求め、
+  頂点が定義域に含まれるかどうかで最大・最小の位置を判断する。
+
+solution_outline: >-
+  y = x(10-x) = -(x-5)^2 + 25。定義域 0 < x < 10 では頂点 x=5 で最大値 25。
+  2 <= x <= 4 では頂点が範囲外(右側)にあり y は増加するため、
+  最大は x=4 で 24、最小は x=2 で 16(選択肢 1)。
+
+verification_strategy: >-
+  SymPy で -x^2 + 10x の頂点と区間 [2, 4] 上の最大値・最小値を計算し、
+  各解答欄の値と選択肢の正解の一意性を確認する(manabi verify math で自動化予定)。
+
+source_data: []
+
+accessibility:
+  figure_descriptions:
+    - 図は使用していない。状況は本文のみで完結する。

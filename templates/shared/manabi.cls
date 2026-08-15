@@ -7,7 +7,9 @@
 %% テンプレートオプション: 対応する manabi-<template>.sty を読み込む。
 %% 各テンプレートの .sty は templates/<template>/ に置かれ、TEXINPUTS で解決される。
 \newif\ifmanabi@guidedexample
+\newif\ifmanabi@commontest
 \DeclareOption{guided-example}{\manabi@guidedexampletrue}
+\DeclareOption{common-test}{\manabi@commontesttrue}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ltjsarticle}}
 \ProcessOptions\relax
 
@@ -27,7 +29,7 @@
 \RequirePackage{amsmath,amssymb}
 \RequirePackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
-\RequirePackage{enumitem}
+\RequirePackage[inline]{enumitem}
 \RequirePackage{fancyhdr}
 \RequirePackage{hyperref}
 \hypersetup{hidelinks,unicode}
@@ -102,6 +104,9 @@
 %% --- テンプレート読み込み(最後に行い、クラス定義を利用可能にする) --------
 \ifmanabi@guidedexample
   \RequirePackage{manabi-guided-example}
+\fi
+\ifmanabi@commontest
+  \RequirePackage{manabi-common-test}
 \fi
 
 \endinput
