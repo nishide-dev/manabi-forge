@@ -163,6 +163,9 @@
               "type": "number"
             },
             {
+              "type": "string"
+            },
+            {
               "type": "null"
             }
           ],
@@ -173,6 +176,9 @@
           "anyOf": [
             {
               "type": "number"
+            },
+            {
+              "type": "string"
             },
             {
               "type": "null"

@@ -170,6 +170,136 @@ class TestVerifyItem:
         assert report.outcomes[0].status == "escalated"
 
 
+class TestSafeGrammar:
+    """信頼境界のテスト: 悪意ある式・DoS 式・非有理式が素通りしないこと。"""
+
+    def test_code_injection_is_rejected_at_model_layer(self):
+        # SymPy の parse_expr は内部で eval を使うため、英字・下線を含む
+        # 文字列がパーサに到達してはならない(spec §19.2)
+        with pytest.raises(ValueError, match="safe grammar"):
+            make_item(
+                [
+                    {
+                        "id": "evil",
+                        "kind": "equivalent",
+                        "expression": '__import__("os").system("true")',
+                        "rhs": "0",
+                    },
+                ],
+            )
+
+    def test_exponent_tower_is_rejected(self):
+        # 9**9**9**9 のような指数タワーは評価前に拒否される(DoS 防止)
+        item = make_item(
+            [
+                {
+                    "id": "dos",
+                    "kind": "equivalent",
+                    "expression": "9**9**9**9",
+                    "rhs": "0",
+                },
+            ],
+        )
+        report = verify_item(item)
+        assert report.outcomes[0].status == "escalated"
+        assert "exponent" in report.outcomes[0].detail
+
+    def test_huge_integer_literals_are_rejected_at_model_layer(self):
+        with pytest.raises(ValueError, match="10"):
+            make_item(
+                [
+                    {
+                        "id": "big",
+                        "kind": "equivalent",
+                        "expression": "12345678901 * x",
+                        "rhs": "0",
+                    },
+                ],
+            )
+
+    def test_transcendental_expressions_are_inexpressible(self):
+        # cos(x) は最大値の達成点が無限個あり solve が主枝しか返さないため
+        # 誤合格の温床になる。x 以外の英字を許さない文法により、周期関数は
+        # そもそもモデル層で表現できない
+        with pytest.raises(ValueError, match="safe grammar"):
+            make_item(
+                [
+                    {
+                        "id": "periodic",
+                        "kind": "maximum",
+                        "expression": "cos(x)",
+                        "expected_x": 0,
+                        "expected_value": 1,
+                    },
+                ],
+            )
+
+    def test_pole_inside_domain_escalates(self):
+        # 1/x は [-1, 1] で極を持ち最大・最小が存在しない。
+        # passed にせず escalated にする
+        item = make_item(
+            [
+                {
+                    "id": "pole",
+                    "kind": "minimum",
+                    "expression": "1/x",
+                    "domain": [-1, 1],
+                    "expected_x": -1,
+                    "expected_value": -1,
+                },
+            ],
+        )
+        report = verify_item(item)
+        assert report.outcomes[0].status == "escalated"
+
+    def test_global_extremum_with_real_pole_escalates(self):
+        item = make_item(
+            [
+                {
+                    "id": "pole-global",
+                    "kind": "maximum",
+                    "expression": "1/x",
+                    "expected_x": 1,
+                    "expected_value": 1,
+                },
+            ],
+        )
+        report = verify_item(item)
+        assert report.outcomes[0].status == "escalated"
+
+    def test_rational_function_without_real_poles_verifies(self):
+        # 1/(1+x^2) は実極を持たず、大域最大 1 を x=0 で一意にとる
+        item = make_item(
+            [
+                {
+                    "id": "bell",
+                    "kind": "maximum",
+                    "expression": "1/(1 + x**2)",
+                    "expected_x": 0,
+                    "expected_value": 1,
+                },
+            ],
+        )
+        report = verify_item(item)
+        assert report.passed, report.outcomes
+
+    def test_exact_rational_expected_values_as_strings(self):
+        # 期待値は "1/3" のような厳密な有理数文字列で書ける(float の丸め回避)
+        item = make_item(
+            [
+                {
+                    "id": "exact",
+                    "kind": "minimum",
+                    "expression": "3*x**2 - 2*x",
+                    "expected_x": "1/3",
+                    "expected_value": "-1/3",
+                },
+            ],
+        )
+        report = verify_item(item)
+        assert report.passed, report.outcomes
+
+
 class TestRepositoryMaterials:
     def test_committed_common_test_item_verifies(self):
         """コミット済み共通テスト風教材の全主張が SymPy 検証を通ること。"""
@@ -213,7 +343,7 @@ class TestVerifyCli:
 
     def test_verify_math_fails_on_seeded_defect(self, material_dir):
         item = make_item(quadratic_checks())
-        item.verification_checks[1].expected_value = 30
+        item.verification_checks[1].expected_value = 30.0
         (material_dir / "item.yaml").write_text(
             yaml.safe_dump(item.model_dump(mode="json"), allow_unicode=True),
             encoding="utf-8",

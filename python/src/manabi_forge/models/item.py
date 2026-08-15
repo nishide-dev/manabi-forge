@@ -6,11 +6,42 @@
 
 from __future__ import annotations
 
+import re
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from manabi_forge.models.common import MaterialId, NonEmptyStr
+
+#: 検証式に許可する文法(信頼境界)。x・数字・四則・べき・括弧のみ。
+#: 英字(x 以外)・アンダースコア・引用符等を禁止することで、SymPy の
+#: パーサ(内部で eval を使う)に任意コードが到達しない(spec §19.2)。
+SAFE_EXPRESSION_PATTERN = re.compile(r"^[0-9x+\-*/(). ]+$")
+
+#: 定数(expected 値)にはさらに x も許可しない。
+SAFE_CONSTANT_PATTERN = re.compile(r"^[0-9+\-*/(). ]+$")
+
+MAX_EXPRESSION_LENGTH = 200
+
+_LONG_INTEGER = re.compile(r"\d{10,}")
+
+
+def validate_safe_expression(value: str, *, allow_x: bool) -> str:
+    """Reject anything outside the whitelisted expression grammar."""
+    pattern = SAFE_EXPRESSION_PATTERN if allow_x else SAFE_CONSTANT_PATTERN
+    if len(value) > MAX_EXPRESSION_LENGTH:
+        msg = f"expression too long (>{MAX_EXPRESSION_LENGTH} chars)"
+        raise ValueError(msg)
+    if not pattern.fullmatch(value):
+        msg = (
+            f"expression {value!r} contains characters outside the safe grammar "
+            "(digits, x, + - * / ( ) . のみ)"
+        )
+        raise ValueError(msg)
+    if _LONG_INTEGER.search(value):
+        msg = f"expression {value!r} contains an integer literal with 10+ digits"
+        raise ValueError(msg)
+    return value
 
 
 class AnswerType(StrEnum):
@@ -76,9 +107,25 @@ class VerificationCheck(BaseModel):
     kind: VerificationKind
     expression: NonEmptyStr
     domain: tuple[float, float] | None = None
-    expected_x: float | None = None
-    expected_value: float | None = None
+    expected_x: float | str | None = None
+    expected_value: float | str | None = None
     rhs: str | None = None
+
+    @field_validator("expression", "rhs")
+    @classmethod
+    def _expression_is_safe(cls, value: str | None) -> str | None:
+        """Enforce the safe expression grammar at the trust boundary."""
+        if value is None:
+            return value
+        return validate_safe_expression(value, allow_x=True)
+
+    @field_validator("expected_x", "expected_value")
+    @classmethod
+    def _expected_is_safe(cls, value: float | str | None) -> float | str | None:
+        """Require string expected values to be safe constants (e.g. "1/3")."""
+        if isinstance(value, str):
+            return validate_safe_expression(value, allow_x=False)
+        return value
 
     @model_validator(mode="after")
     def _fields_match_kind(self) -> VerificationCheck:
