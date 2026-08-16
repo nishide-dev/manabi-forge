@@ -22,18 +22,19 @@ parts:
   - id: "4"
     prompt: 2 <= x <= 4 において y が最小となる x の値を選ぶ。
     answer_type: multiple-choice
-    correct_answer: "1"
+    # 選択肢ラベルは共通テストの慣行に合わせ 0 始まり(⓪〜③)
+    correct_answer: "0"
     choices:
-      - label: "1"
+      - label: "0"
         text: x = 2
         is_correct: true
-      - label: "2"
+      - label: "1"
         text: x = 3
         rationale: 区間の中央で最小になるという誤解。上に凸の場合は頂点から最も遠い端点で最小となる。
-      - label: "3"
+      - label: "2"
         text: x = 4
         rationale: 最大と最小の位置の取り違え。x = 4 は頂点に近い側の端点で最大を与える。
-      - label: "4"
+      - label: "3"
         text: 最小となる x の値はない
         rationale: 閉区間では端点で最小値をとることの見落とし。開区間との混同。
 
@@ -49,7 +50,7 @@ intended_reasoning: >-
 solution_outline: >-
   y = x(10-x) = -(x-5)^2 + 25。定義域 0 < x < 10 では頂点 x=5 で最大値 25。
   2 <= x <= 4 では頂点が範囲外(右側)にあり y は増加するため、
-  最大は x=4 で 24、最小は x=2 で 16(選択肢 1)。
+  最大は x=4 で 24、最小は x=2 で 16(選択肢 0)。
 
 verification_strategy: >-
   SymPy で -x^2 + 10x の頂点と区間 [2, 4] 上の最大値・最小値を計算し、

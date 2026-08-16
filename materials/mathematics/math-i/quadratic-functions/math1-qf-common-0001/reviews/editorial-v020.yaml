@@ -1,0 +1,18 @@
+created_at: '2026-08-16T18:39:42.493128Z'
+findings:
+- code: wording-check-v020
+  location: source/main.tex
+  message: 読点を全角「,」に統一(U+FF0C、数式内は ASCII 維持)。(4) を記述→指示文→解答群の実物準拠の順に再構成。選択肢 0 始まり化に伴う本文・解答・誤答根拠・item.yaml
+    の整合はレビューエージェントが3 ファイル横断で全数確認し、一致(off-by-one なし)。
+  severity: note
+  suggested_action: ''
+material_id: math1-qf-common-0001
+result: passed
+review_id: editorial-agent-20260816-v020
+review_type: editorial
+reviewed_commit: 76ca5a52916479c81e90600f650c9d965c76f514
+reviewer:
+  kind: automated
+  name: claude-fable-5
+  tool_version: claude-fable-5 (Claude Code agent review)
+schema_version: '1.0'

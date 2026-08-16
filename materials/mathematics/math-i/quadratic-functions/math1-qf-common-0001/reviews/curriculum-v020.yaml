@@ -1,0 +1,17 @@
+created_at: '2026-08-16T18:39:42.493128Z'
+findings:
+- code: recheck-v020
+  location: material.yaml:curriculum.codes
+  message: v0.2.0 での変更は組版・表記(判型 B5、読点「,」、選択肢 0 始まり)のみで数学的内容は不変。引用コードの解決を再確認済み。
+  severity: note
+  suggested_action: ''
+material_id: math1-qf-common-0001
+result: passed
+review_id: curriculum-agent-20260816-v020
+review_type: curriculum
+reviewed_commit: 76ca5a52916479c81e90600f650c9d965c76f514
+reviewer:
+  kind: automated
+  name: claude-fable-5
+  tool_version: claude-fable-5 (Claude Code agent review)
+schema_version: '1.0'
