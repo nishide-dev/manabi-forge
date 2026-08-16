@@ -37,7 +37,9 @@
 %% 「— n —」形式。トレーサビリティ用の教材 ID は右下に小さく残す。
 %% 免責はノンブル下に必ず表示する(spec §4.3、実物にはない本プロジェクト要件)。
 \fancyhf{}
-\fancyhead[R]{\sffamily\bfseries\large \manabi@course}
+%% 実物は見開きの外側(奇数ページ右・偶数ページ左)。oneside では全ページが
+%% 奇数扱いのため常に右になるが、twoside 化した際にそのまま追従する。
+\fancyhead[RO,LE]{\sffamily\bfseries\large \manabi@course}
 \fancyfoot[C]{\parbox{0.94\textwidth}{\centering
   \textemdash\ \thepage\ \textemdash\\[1pt]
   {\scriptsize \ManabiDisclaimer\\
@@ -82,6 +84,9 @@
 %% --- 解答欄記号 --------------------------------------------------------------
 %% 実物の規約に合わせ、単枠 = 数字を記入する欄、二重枠 = 解答群から選ぶ欄。
 %% 複数文字(アイ 等)は 1 文字 1 枠で、隣接する枠は罫線を共有する。
+%% 既知の制限: 枠サイズは本文サイズ固定のため、上付き・分数などスクリプト
+%% サイズの数式内では枠が大きすぎる。指数や分数の解答欄が必要になった時点で
+%% \mathchoice によるサイズ追従を導入すること。
 \newcommand*\mnb@anslabel[1]{%
   \makebox[1.05\zw][c]{\sffamily\bfseries\vphantom{アj0}#1}}
 \newcommand*\mnb@single[1]{{%
