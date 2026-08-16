@@ -5,9 +5,9 @@
       "ai_assisted": true,
       "artifacts": {
         "answer_sheet_pdf": null,
-        "problem_pdf": "https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-common-0001-v0.1.0/math1-qf-common-0001-v0.1.0-problem.pdf",
+        "problem_pdf": "https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-common-0001-v0.2.0/math1-qf-common-0001-v0.2.0-problem.pdf",
         "solution_pdf": null,
-        "source_bundle": "https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-common-0001-v0.1.0/math1-qf-common-0001-v0.1.0-source.zip"
+        "source_bundle": "https://github.com/nishide-dev/manabi-forge/releases/download/math1-qf-common-0001-v0.2.0/math1-qf-common-0001-v0.2.0-source.zip"
       },
       "course": "mathematics-i",
       "curriculum_codes": [
