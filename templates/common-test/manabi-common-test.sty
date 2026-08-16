@@ -1,12 +1,16 @@
 %% manabi-common-test.sty — 共通テスト風テンプレート(spec §15.2)
-%% 多パート問題、選択肢、解答欄記号(ア・イ・…)のコンポーネントを提供する。
-%% 視覚デザインは Manabi Forge 独自のものであり、公式の試験冊子を
-%% 複製しない。全ページに非公式教材ディスクレーマーが入る(共有クラス)。
+%% 実際の共通テスト冊子の「構造的な組版規約」(判型・見出し・解答欄記号・
+%% 解答群・ノンブル等)を参考にした独自実装であり、公式の試験冊子を
+%% そのまま複製したものではない。全ページに非公式教材ディスクレーマーが
+%% 入る(共有クラス + 本テンプレートの追加文)。
 %% ライセンス: Apache-2.0(リポジトリルートの LICENSE-CODE)
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{manabi-common-test}[2026/08/16 v0.1.0 Manabi Forge common-test style template]
+\ProvidesPackage{manabi-common-test}[2026/08/17 v0.2.0 Manabi Forge common-test style template]
 
-\ManabiTemplate{common-test}{0.1.0}
+\ManabiTemplate{common-test}{0.2.0}
+
+\RequirePackage{pict2e}% 丸数字の縦長楕円描画(\oval)に使用
+\RequirePackage{tasks}
 
 %% 共通テスト風教材は「過去問・公式サンプルではない」旨も明示する(spec §4.3)
 \renewcommand*\ManabiDisclaimer{%
@@ -15,47 +19,178 @@
   公式教材ではありません。本教材は共通テストの出題形式を参考にした独自の%
   演習教材であり、過去問題や公式サンプル問題ではありません。}
 
-%% --- 大問ボックス -----------------------------------------------------------
-%% 使用例: \begin{mnbproblem}[(配点 20)]{1} ... \end{mnbproblem}
-%% 注意: 任意引数(配点など)が先、大問番号が後。逆にすると配点が本文に
-%% リークしたまま黙って組版されるので順序を守ること。
-\newtcolorbox{mnbproblem}[2][]{
-  colback=white,
-  colframe=black!80,
-  coltitle=white,
-  colbacktitle=black!80,
-  boxrule=0.6pt,
-  arc=1.5pt,
-  left=8pt, right=8pt, top=7pt, bottom=7pt,
-  breakable,
-  fonttitle=\bfseries\small,
-  title={第#2問 #1},
-  before skip=10pt, after skip=10pt,
+%% --- 判型: JIS B5(実物と同じ判型。判型自体は一般規格) ---------------------
+\geometry{
+  paperwidth=182mm,
+  paperheight=257mm,
+  left=22mm, right=22mm,
+  top=20mm, bottom=27mm,
+  headheight=18pt,
+  footskip=34pt,
 }
+%% 共有クラスは A4 前提で fancyhdr を初期化しているため、判型変更後に
+%% ヘッダ幅を新しい本文幅へ追従させる(これを怠るとヘッダが紙面外に出る)
+\setlength{\headwidth}{\textwidth}
 
-%% --- 解答欄記号 --------------------------------------------------------------
-%% \mnbans{アイ}: 解答欄に対応する枠付き記号。慣例として数字 1 桁につき
-%% 記号 1 文字を割り当てるが、表示は 1 つの枠にまとめる(桁ごとの枠分割は
-%% 解答用紙テンプレート導入時に検討)。
-\newcommand*\mnbans[1]{%
-  \mbox{\fboxsep=2.5pt\fbox{\textbf{\vphantom{アj}#1}}}}
+%% --- ヘッダ・フッタ ----------------------------------------------------------
+%% 科目名をページ上部右にゴシックで表示(罫線なし)。ノンブルは中央
+%% 「— n —」形式。トレーサビリティ用の教材 ID は右下に小さく残す。
+%% 免責はノンブル下に必ず表示する(spec §4.3、実物にはない本プロジェクト要件)。
+\fancyhf{}
+\fancyhead[R]{\sffamily\bfseries\large \manabi@course}
+\fancyfoot[C]{\parbox{0.94\textwidth}{\centering
+  \textemdash\ \thepage\ \textemdash\\[1pt]
+  {\scriptsize \ManabiDisclaimer\\
+  ライセンス: \manabi@contentlicense\quad
+  テンプレート: \manabi@templatename\ v\manabi@templateversion\quad
+  {\ttfamily \manabi@id\ v\manabi@version}}}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+%% --- タイトルブロック(ゴシック中央、実物の表紙見出し風) -------------------
+\renewcommand*\ManabiMakeTitle{%
+  \begin{center}
+    {\LARGE\sffamily\bfseries \manabi@title\par}
+    \vspace{4pt}
+    {\small
+      \manabi@course
+      \ifx\manabi@unit\empty\else \quad|\quad \manabi@unit\fi
+      \ifx\manabi@difficulty\empty\else \quad|\quad 難易度:~\manabi@difficulty\fi
+      \ifx\manabi@minutes\empty\else \quad|\quad 目安時間:~\manabi@minutes 分\fi
+      \par}
+  \end{center}
+  \vspace{4pt}}
+
+%% --- 大問見出し --------------------------------------------------------------
+%% 実物同様、枠なしのゴシック見出し「第1問 (配点 30)」。
+%% 使用例: \begin{mnbproblem}[(配点 20)]{1} ... \end{mnbproblem}
+%% (任意引数 = 配点等、必須引数 = 大問番号。v0.1 と同じ引数順)
+\NewDocumentEnvironment{mnbproblem}{O{}m}{%
+  \par\addvspace{1.4\baselineskip}%
+  \noindent{\sffamily\bfseries\large 第#2問}%
+  \if\relax\detokenize{#1}\relax\else\hspace{1em}{\normalsize #1}\fi
+  \par\nobreak\addvspace{0.9\baselineskip}%
+}{\par\addvspace{1.2\baselineskip}}
+
+%% --- 中問番号 〔1〕 ----------------------------------------------------------
+\newcommand*\mnbchumon[1]{\par\addvspace{0.8\baselineskip}\noindent〔#1〕\hspace{0.8em}}
 
 %% --- 小問リスト --------------------------------------------------------------
 \newlist{mnbparts}{enumerate}{1}
-\setlist[mnbparts]{label=(\arabic*), leftmargin=2.2em, itemsep=6pt}
+\setlist[mnbparts]{label=(\arabic*), leftmargin=2.2em, itemsep=10pt}
 
-%% --- 選択肢 ------------------------------------------------------------------
-%% 横並びの選択肢: \begin{mnbchoices} \item ... \end{mnbchoices}
-\newcommand*\mnbcircled[1]{\textcircled{\kern0.4pt\raisebox{0.4pt}{\scriptsize #1}\kern0.4pt}}
-\newlist{mnbchoices}{enumerate*}{1}
-\setlist[mnbchoices]{label=\protect\mnbcircled{\arabic*}, itemjoin=\hspace{1.6em}, before=\vspace{2pt}}
+%% --- 解答欄記号 --------------------------------------------------------------
+%% 実物の規約に合わせ、単枠 = 数字を記入する欄、二重枠 = 解答群から選ぶ欄。
+%% 複数文字(アイ 等)は 1 文字 1 枠で、隣接する枠は罫線を共有する。
+\newcommand*\mnb@anslabel[1]{%
+  \makebox[1.05\zw][c]{\sffamily\bfseries\vphantom{アj0}#1}}
+\newcommand*\mnb@single[1]{{%
+  \setlength\fboxrule{0.5pt}\setlength\fboxsep{2.6pt}%
+  \fbox{\mnb@anslabel{#1}}}}
+\newcommand*\mnb@double[1]{{%
+  \setlength\fboxrule{0.5pt}\setlength\fboxsep{1.3pt}%
+  \fbox{{\setlength\fboxsep{2.2pt}\fbox{\mnb@anslabel{#1}}}}}}
+
+\ExplSyntaxOn
+\bool_new:N \l__mnb_first_bool
+\cs_new_protected:Npn \mnb_boxes:Nn #1#2
+ {
+  \mode_leave_vertical:
+  \hbox_set:Nn \l_tmpa_box
+   {
+    \bool_set_true:N \l__mnb_first_bool
+    \tl_map_inline:nn {#2}
+     {
+      \bool_if:NTF \l__mnb_first_bool
+       { \bool_set_false:N \l__mnb_first_bool }
+       { \kern -0.5pt } % 隣接する枠の罫線を 1 本に重ねる
+      #1 {##1}
+     }
+   }
+  % 実物同様、枠の前後にわずかなアキを置き、数式内では数式軸に
+  % 縦中央揃えする(ベースライン乗せだと枠が上に浮いて見える)
+  \kern 1.8pt
+  \mode_if_math:TF
+   { \vcenter { \box_use:N \l_tmpa_box } }
+   { \raisebox{-0.18\height}{ \box_use:N \l_tmpa_box } }
+  \kern 1.8pt
+ }
+%% \mnbans{アイ}: 数字記入欄(単枠、1 文字 1 枠)
+\NewDocumentCommand{\mnbans}{m}{ \mnb_boxes:Nn \mnb@single {#1} }
+%% \mnbansd{ア}: 解答群から選ぶ欄(二重枠)
+\NewDocumentCommand{\mnbansd}{m}{ \mnb_boxes:Nn \mnb@double {#1} }
+\ExplSyntaxOff
+
+%% --- 丸数字(縦長楕円・⓪始まり) --------------------------------------------
+%% 実物同様の縦長楕円。TikZ は tasks のラベル文脈と catcode が衝突するため、
+%% pict2e の \oval で描く(picture モードは文脈を選ばない)。
+\newcommand*\mnbcircled[1]{%
+  \begingroup
+  \sbox\@tempboxa{\small #1}%
+  \@tempdima=\dimexpr\wd\@tempboxa+4.4pt\relax  % 楕円の幅
+  \@tempdimb=\dimexpr\ht\@tempboxa+\dp\@tempboxa+3.2pt\relax % 楕円の高さ
+  \dimen@=\dimexpr(\ht\@tempboxa-\dp\@tempboxa)/2\relax      % 中心の高さ
+  \setlength\unitlength{1pt}%
+  \linethickness{0.5pt}%
+  \begin{picture}(\strip@pt\@tempdima,0)(0,0)
+    \put(\strip@pt\dimexpr\@tempdima/2\relax,\strip@pt\dimen@){%
+      \oval(\strip@pt\@tempdima,\strip@pt\@tempdimb)}
+    \put(\strip@pt\dimexpr\@tempdima/2\relax,\strip@pt\dimen@){%
+      \makebox(0,0)[c]{\usebox\@tempboxa}}
+  \end{picture}%
+  \endgroup}
+
+%% --- 解答群 ------------------------------------------------------------------
+%% 使用例:
+%%   \begin{mnbanswergroup}[(同じものを繰り返し選んでもよい。)]{\mnbansd{ア}}
+%%     \begin{mnbchoices}[2]
+%%       \task $x = 2$
+%%       \task ...
+%%     \end{mnbchoices}
+%%   \end{mnbanswergroup}
+\tcbset{
+  mnb@groupframe/.style={
+    colback=white,
+    colframe=black,
+    boxrule=0.5pt,
+    sharp corners,
+    left=10pt, right=10pt, top=7pt, bottom=7pt,
+    breakable,
+    before skip=6pt, after skip=10pt,
+  },
+}
+\NewDocumentEnvironment{mnbanswergroup}{O{}m}{%
+  \par\addvspace{0.9\baselineskip}%
+  \noindent #2\hspace{0.5\zw}の解答群#1\par\nobreak\smallskip
+  \begin{tcolorbox}[mnb@groupframe]%
+}{\end{tcolorbox}}
+
+%% 選択肢グリッド(⓪始まり)。引数 = 列数。項目は \task で書く。
+\settasks{
+  label = \mnbcircled{\arabic*},
+  label-width = 1.6em,
+  label-offset = 0.7em,
+  item-indent = 2.4em,
+  after-item-skip = 7pt,
+  before-skip = 0pt,
+  after-skip = 0pt,
+}
+\NewDocumentEnvironment{mnbchoices}{O{2}}{%
+  \begin{tasks}[start=0](#1)%
+}{\end{tasks}}
+
+%% --- 続き注記(右寄せ小サイズ) ----------------------------------------------
+%% 使用例: \mnbcontinue{1} → (数学I第1問は次ページに続く。)
+\newcommand*\mnbcontinue[1]{%
+  \par\nopagebreak\vspace{2pt}%
+  {\raggedleft\small (\manabi@course 第#1問は次ページに続く。)\par}}
 
 %% --- 解答・解説セクション ----------------------------------------------------
 %% 問題冊子と明確に区切る(公開時は別 PDF として配布予定)。
 \newcommand*\ManabiSolutionPart{%
   \newpage
   \begin{center}
-    {\large\bfseries 解答・解説}\\[2pt]
+    {\large\sffamily\bfseries 解答・解説}\\[2pt]
     {\small ここから先は解答編です。問題を解いてから読むことを推奨します。}
   \end{center}
   \vspace{4pt}}
