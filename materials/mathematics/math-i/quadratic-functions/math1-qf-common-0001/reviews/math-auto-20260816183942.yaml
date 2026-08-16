@@ -1,0 +1,12 @@
+created_at: '2026-08-16T18:39:42.132103Z'
+findings: []
+material_id: math1-qf-common-0001
+result: passed
+review_id: math-auto-20260816183942
+review_type: mathematics
+reviewed_commit: 76ca5a52916479c81e90600f650c9d965c76f514
+reviewer:
+  kind: automated
+  name: manabi-verify-math
+  tool_version: 0.1.0
+schema_version: '1.0'

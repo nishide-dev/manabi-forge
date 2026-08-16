@@ -1,0 +1,18 @@
+created_at: '2026-08-16T18:39:42.493128Z'
+findings:
+- code: originality-v020
+  location: provenance.yaml
+  message: 実物冊子から取り込んだのは構造的な組版規約のみで、問題文・図・選択肢の複製なし。冊子識別コードは模倣せず、参照 PDF はリポジトリ外でのみ使用(git
+    ls-files にバイナリ混入なしを確認)。
+  severity: note
+  suggested_action: ''
+material_id: math1-qf-common-0001
+result: passed
+review_id: rights-agent-20260816-v020
+review_type: rights
+reviewed_commit: 76ca5a52916479c81e90600f650c9d965c76f514
+reviewer:
+  kind: automated
+  name: claude-fable-5
+  tool_version: claude-fable-5 (Claude Code agent review)
+schema_version: '1.0'

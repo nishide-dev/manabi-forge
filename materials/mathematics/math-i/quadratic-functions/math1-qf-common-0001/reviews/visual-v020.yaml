@@ -1,0 +1,18 @@
+created_at: '2026-08-16T18:39:42.493128Z'
+findings:
+- code: page-inspection-v020
+  location: build/main.pdf
+  message: v0.2.0 新レイアウト(JIS B5・枠なし大問見出し・単枠/二重枠解答欄・⓪始まり楕円丸数字・解答群枠・右上科目名・中央ノンブル)の全
+    2 ページを130dpi で目視確認し、実物冊子ページと見比べ済み。overfull 0、免責フッタ全ページ表示、二重枠の内外罫線は 900dpi で分離を確認。
+  severity: note
+  suggested_action: ''
+material_id: math1-qf-common-0001
+result: passed
+review_id: visual-agent-20260816-v020
+review_type: visual
+reviewed_commit: 76ca5a52916479c81e90600f650c9d965c76f514
+reviewer:
+  kind: automated
+  name: claude-fable-5
+  tool_version: claude-fable-5 (Claude Code agent review)
+schema_version: '1.0'
